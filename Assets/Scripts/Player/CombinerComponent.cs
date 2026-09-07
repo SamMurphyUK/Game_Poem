@@ -101,7 +101,7 @@ public class CombinerComponent : MonoBehaviour
             return aIsDriven ? a : b;
         }
 
-        return a.GetInstanceID() <= b.GetInstanceID() ? a : b;
+        return a.GetEntityId() <= b.GetEntityId() ? a : b;
     }
 
     private void StartCombine(CombinerComponent attachment)
