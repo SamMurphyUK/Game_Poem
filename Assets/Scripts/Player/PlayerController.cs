@@ -44,4 +44,9 @@ public class PlayerController : MonoBehaviour
     {
         rb.linearVelocity = moveInput * moveSpeed;
     }
+
+    public float GetMoveSpeed()
+    {
+        return moveSpeed;
+    }
 }

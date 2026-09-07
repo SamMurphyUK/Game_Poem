@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 3415938257698960301}
   - component: {fileID: 7093094819793165502}
   - component: {fileID: 8238450814262232033}
+  - component: {fileID: 8412663057722190345}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -362,3 +363,29 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 3, y: 1.5}
   m_EdgeRadius: 0
+--- !u!114 &8412663057722190345
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2067279046881853296}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87ba507869a04895af2f0d4bebd2cdb5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerExhaust
+  puffsPerSecond: 10
+  minimumSpeed: 0.25
+  topSpeed: 0
+  spawnOffset: 0.9
+  lifetime: 1.5
+  size: 0.14
+  sizeVariation: 0.35
+  growth: 1.7
+  ejectSpeed: 0.45
+  sideSpread: 0.2
+  drag: 3.5
+  startColor: {r: 1, g: 0.76, b: 0.45, a: 0.75}
+  endColor: {r: 0.85, g: 0.3, b: 0.18, a: 0}
+  sortingOrderOffset: -1
