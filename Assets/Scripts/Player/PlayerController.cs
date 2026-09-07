@@ -3,26 +3,48 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] float moveSpeed = 5f;
+    [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private KeyCode upKey;
+    [SerializeField] private KeyCode downKey;
+    [SerializeField] private KeyCode leftKey;
+    [SerializeField] private KeyCode rightKey;
+
+    private Rigidbody2D rb;
     private Vector2 moveInput;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private void Awake()
     {
-        
+        rb = GetComponent<Rigidbody2D>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        Vector3 movement = new Vector3(moveInput.x, moveInput.y, 0f) * moveSpeed * Time.deltaTime;
+        moveInput = Vector2.zero;
 
-        // Directly modify the transform's position
-        transform.position += movement;
+        if (Input.GetKey(upKey)) moveInput.y += 1f;
+        if (Input.GetKey(downKey)) moveInput.y -= 1f;
+        if (Input.GetKey(rightKey)) moveInput.x += 1f;
+        if (Input.GetKey(leftKey)) moveInput.x -= 1f;
+
+        if (moveInput.magnitude > 1f)
+        {
+            moveInput.Normalize();
+        }
     }
 
-    public void Move(InputAction.CallbackContext context)
+    void FixedUpdate()
     {
-        moveInput = context.ReadValue<Vector2>();
+        rb.linearVelocity = moveInput * moveSpeed;
     }
+
+    //private void FixedUpdate()
+    //{
+    //    // Continuously move the Rigidbody2D based on the held direction
+    //    rb.linearVelocity = moveInput * moveSpeed;
+    //}
+
+    //public void Move(InputAction.CallbackContext context)
+    //{
+    //    moveInput = context.ReadValue<Vector2>();
+    //}
 }
