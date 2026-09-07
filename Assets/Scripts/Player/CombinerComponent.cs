@@ -45,14 +45,14 @@ public class CombinerComponent : MonoBehaviour
             return;
         }
 
+        Debug.Log("Collided with: " + other.name);
+
         CombinerComponent otherCombiner = other.GetComponent<CombinerComponent>();
 
         if (!CanCombineWith(otherCombiner))
         {
             return;
         }
-
-        Debug.Log("Collided with: " + other.name);
 
         // Both colliders of a pair get this callback, and more than one partner can
         // overlap us in the same physics step, so the roles are picked from the
@@ -166,7 +166,11 @@ public class CombinerComponent : MonoBehaviour
 
         yield return new WaitForSeconds(timeBeforeDetatch);
 
-        attachment.Detach();
+        if (attachment != null)
+        {
+            attachment.Detach();
+        }
+
         AdvanceStage();
         ReleasePair(attachment);
     }
