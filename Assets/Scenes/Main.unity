@@ -646,7 +646,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraFollow
   player: {fileID: 1099870420}
-  offset: {x: 0, y: 0, z: -1000}
+  offset: {x: 0, y: 0, z: -15}
 --- !u!1 &2041326431
 GameObject:
   m_ObjectHideFlags: 0
@@ -953,7 +953,7 @@ PrefabInstance:
       objectReference: {fileID: 1857249941}
     - target: {fileID: 7093094819793165502, guid: 421a3bc049cd78a4099d24e612ad8a80, type: 3}
       propertyPath: m_Volume
-      value: 0.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7093094819793165502, guid: 421a3bc049cd78a4099d24e612ad8a80, type: 3}
       propertyPath: m_Resource
@@ -962,6 +962,14 @@ PrefabInstance:
     - target: {fileID: 7093094819793165502, guid: 421a3bc049cd78a4099d24e612ad8a80, type: 3}
       propertyPath: m_PlayOnAwake
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8238450814262232033, guid: 421a3bc049cd78a4099d24e612ad8a80, type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.x
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8238450814262232033, guid: 421a3bc049cd78a4099d24e612ad8a80, type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.y
+      value: 2.05
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
