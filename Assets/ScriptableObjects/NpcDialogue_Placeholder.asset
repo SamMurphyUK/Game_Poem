@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 592cbed7791747e8acee9ebe5b617df1, type: 3}
+  m_Name: NpcDialogue_Placeholder
+  m_EditorClassIdentifier: Assembly-CSharp::NpcDialogueSO
+  defaultLines:
+  - I have nothing left to say.
+  byStage:
+  - stage: 0
+    lines:
+    - I have been standing here a long time.
+    - Something of you is missing.
+  - stage: 1
+    lines:
+    - You are not what you were.
+    - It suits you, what you took.
+  - stage: 2
+    lines:
+    - There is little left to join.
+    - Stay. We are nearly whole.

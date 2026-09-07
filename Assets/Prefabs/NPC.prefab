@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 5400755032748617032}
   - component: {fileID: 3493407513764546481}
   - component: {fileID: 2994468734173236518}
+  - component: {fileID: 4185027739160458213}
   m_Layer: 0
   m_Name: NPC
   m_TagString: NPC
@@ -198,3 +199,27 @@ MonoBehaviour:
   rotationSpeed: 360
   stoppingDistance: 0.1
   timeBeforeDetatch: 3
+--- !u!114 &4185027739160458213
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8262647414866110968}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3951429d24a4457a6d90d7f80ed9c60, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NpcDialogue
+  dialogue: {fileID: 11400000, guid: 64650a19314748018c37888acb1dc288, type: 2}
+  secondsPerLine: 3.5
+  silentWhileCombining: 1
+  speakRange: 5
+  silenceRange: 6.5
+  font: {fileID: 0}
+  heightAboveSprite: 0.4
+  labelWidth: 6
+  textSize: 0.35
+  textColor: {r: 0.93, g: 0.9, b: 0.86, a: 1}
+  sortingOrderOffset: 10
+  fadeDuration: 0.35
