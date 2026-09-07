@@ -21,6 +21,7 @@ public class CombinerComponent : MonoBehaviour
     private bool isMovingToCombine = false;
     private bool isAttached = false;
     private CombinerComponent partner;
+    private AudioSource audioSource;
 
     private RigidbodyType2D bodyTypeBeforeAttach;
     private bool controllerEnabledBeforeAttach;
@@ -31,6 +32,7 @@ public class CombinerComponent : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         controller = GetComponent<PlayerController>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     public bool IsMovingToCombine()
@@ -114,6 +116,8 @@ public class CombinerComponent : MonoBehaviour
 
     private IEnumerator CombineAnchorPoints(CombinerComponent attachment)
     {
+        audioSource?.Play();
+
         Transform thisAnchor = transform.Find("AnchorPoint");
         Transform otherAnchor = attachment.transform.Find("AnchorPoint");
 

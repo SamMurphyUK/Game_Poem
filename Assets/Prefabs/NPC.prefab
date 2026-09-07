@@ -194,3 +194,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CombinerComponent
   currentType: {fileID: 11400000, guid: eff42dcb5bd729248b1e120f80619172, type: 2}
+  movementSpeed: 5
+  rotationSpeed: 360
+  stoppingDistance: 0.1
+  timeBeforeDetatch: 3
