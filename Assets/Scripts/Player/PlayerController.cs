@@ -36,15 +36,4 @@ public class PlayerController : MonoBehaviour
     {
         rb.linearVelocity = moveInput * moveSpeed;
     }
-
-    //private void FixedUpdate()
-    //{
-    //    // Continuously move the Rigidbody2D based on the held direction
-    //    rb.linearVelocity = moveInput * moveSpeed;
-    //}
-
-    //public void Move(InputAction.CallbackContext context)
-    //{
-    //    moveInput = context.ReadValue<Vector2>();
-    //}
 }
