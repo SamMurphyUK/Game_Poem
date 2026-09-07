@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CombinationRuleSO
   matchingType: {fileID: 11400000, guid: 0744ebb125b10a847ad43a06b044abec, type: 2}
   result: {fileID: 11400000, guid: b52f7e179ae59f041a69d66dbba186de, type: 2}
-  sprite: {fileID: 21300000, guid: c481ab8b20b6c094dbc5aaac4f7ecfff, type: 3}
+  sprite: {fileID: 21300000, guid: 495365920c3e41a4f9118bdebb59b2f0, type: 3}
