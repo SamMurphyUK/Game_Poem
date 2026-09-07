@@ -17,23 +17,20 @@ public class CombinerComponent : MonoBehaviour
     [SerializeField] private float timeBeforeDetatch = 3f;
 
     private Rigidbody2D rb;
+    private PlayerController controller;
     private bool isMovingToCombine = false;
+    private bool isAttached = false;
+    private CombinerComponent partner;
+
+    private RigidbodyType2D bodyTypeBeforeAttach;
+    private bool controllerEnabledBeforeAttach;
 
     private CombinationStage currentStage = CombinationStage.Stage1;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-    }
-
-    void Start()
-    {
-        
-    }
-
-    void Update()
-    {
-        
+        controller = GetComponent<PlayerController>();
     }
 
     public bool IsMovingToCombine()
@@ -43,31 +40,87 @@ public class CombinerComponent : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player") || other.CompareTag("NPC"))
+        if (!other.CompareTag("Player") && !other.CompareTag("NPC"))
         {
-            Debug.Log("Collided with: " + other.name);
-            var playerCombiner = other.GetComponent<CombinerComponent>();
-
-            if (playerCombiner != null && playerCombiner.currentType.GetMatchingType() == currentType && !isMovingToCombine)
-            {
-                StartCoroutine(CombineAnchorPoints(other.gameObject));
-            }
+            return;
         }
+
+        CombinerComponent otherCombiner = other.GetComponent<CombinerComponent>();
+
+        if (!CanCombineWith(otherCombiner))
+        {
+            return;
+        }
+
+        Debug.Log("Collided with: " + other.name);
+
+        // Both colliders of a pair get this callback, and more than one partner can
+        // overlap us in the same physics step, so the roles are picked from the
+        // objects themselves rather than from whichever callback happened to run first.
+        CombinerComponent host = ChooseHost(this, otherCombiner);
+        CombinerComponent attachment = host == this ? otherCombiner : this;
+
+        host.StartCombine(attachment);
     }
 
-    private IEnumerator CombineAnchorPoints(GameObject other)
+    private bool CanCombineWith(CombinerComponent otherCombiner)
     {
-        isMovingToCombine = true;
-        other.GetComponent<CombinerComponent>().isMovingToCombine = true;
+        if (otherCombiner == null || otherCombiner == this)
+        {
+            return false;
+        }
 
+        if (IsBusy() || otherCombiner.IsBusy())
+        {
+            return false;
+        }
+
+        if (currentType == null || otherCombiner.currentType == null)
+        {
+            return false;
+        }
+
+        return otherCombiner.currentType.GetMatchingType() == currentType
+            || currentType.GetMatchingType() == otherCombiner.currentType;
+    }
+
+    private bool IsBusy()
+    {
+        return isMovingToCombine || isAttached || partner != null;
+    }
+
+    // Whoever keeps driving its own movement has to stay the parent: a driven object
+    // that gets parented to a partner loses control of its transform for good.
+    private static CombinerComponent ChooseHost(CombinerComponent a, CombinerComponent b)
+    {
+        bool aIsDriven = a.controller != null;
+        bool bIsDriven = b.controller != null;
+
+        if (aIsDriven != bIsDriven)
+        {
+            return aIsDriven ? a : b;
+        }
+
+        return a.GetInstanceID() <= b.GetInstanceID() ? a : b;
+    }
+
+    private void StartCombine(CombinerComponent attachment)
+    {
+        // Claim both sides before the first yield so another overlapping partner
+        // cannot start a second combine against either of us.
+        ClaimPair(attachment);
+        StartCoroutine(CombineAnchorPoints(attachment));
+    }
+
+    private IEnumerator CombineAnchorPoints(CombinerComponent attachment)
+    {
         Transform thisAnchor = transform.Find("AnchorPoint");
-        Transform otherAnchor = other.transform.Find("AnchorPoint");
+        Transform otherAnchor = attachment.transform.Find("AnchorPoint");
 
         if (thisAnchor == null || otherAnchor == null)
         {
             Debug.LogWarning("Anchorpoint not found on one or both objects");
-            isMovingToCombine = false;
-            other.GetComponent<CombinerComponent>().isMovingToCombine = false;
+            ReleasePair(attachment);
             yield break;
         }
 
@@ -79,11 +132,11 @@ public class CombinerComponent : MonoBehaviour
             transform.position += thisToOtherDirection * movementSpeed * Time.deltaTime;
 
             Vector3 otherToThisDirection = (thisAnchor.position - otherAnchor.position).normalized;
-            other.transform.position += otherToThisDirection * movementSpeed * Time.deltaTime;
+            attachment.transform.position += otherToThisDirection * movementSpeed * Time.deltaTime;
 
             // Rotation: rotate each object to face towards the other's anchorpoint
             RotateTowardsDirection(transform, thisToOtherDirection);
-            RotateTowardsDirection(other.transform, otherToThisDirection);
+            RotateTowardsDirection(attachment.transform, otherToThisDirection);
 
             yield return null;
         }
@@ -91,39 +144,31 @@ public class CombinerComponent : MonoBehaviour
         // Get the result before combining
         CombinationRuleSO result = currentType.GetResult();
 
-        if (result != null)
+        if (result == null)
         {
-            // Combine both objects into the result
-            Combine(result);
-            other.GetComponent<CombinerComponent>().Combine(result);
-            
-            // Disable the other object's PlayerController/movement scripts BEFORE reparenting
-            PlayerController otherController = other.GetComponent<PlayerController>();
-            if (otherController != null)
-            {
-                otherController.enabled = false;
-            }
-            
-            // Disable the other object's rigidbody so it moves with the parent
-            Rigidbody2D otherRb = other.GetComponent<Rigidbody2D>();
-            if (otherRb != null)
-            {
-                otherRb.isKinematic = true;
-                otherRb.linearVelocity = Vector2.zero;
-            }
-            
-            // Make the other object a child of this object
-            other.transform.SetParent(transform, worldPositionStays: true);
+            result = attachment.currentType.GetResult();
         }
-        else
+
+        if (result == null)
         {
             Debug.LogError("Combination result is null for: " + currentType.name);
+            ReleasePair(attachment);
+            yield break;
         }
 
-        isMovingToCombine = false;
-        other.GetComponent<CombinerComponent>().isMovingToCombine = false;
+        // Combine both objects into the result
+        Combine(result);
+        attachment.Combine(result);
+        attachment.Attach(transform);
 
-        StartCoroutine(Detach(other));
+        isMovingToCombine = false;
+        attachment.isMovingToCombine = false;
+
+        yield return new WaitForSeconds(timeBeforeDetatch);
+
+        attachment.Detach();
+        AdvanceStage();
+        ReleasePair(attachment);
     }
 
     private void RotateTowardsDirection(Transform target, Vector3 direction)
@@ -153,12 +198,73 @@ public class CombinerComponent : MonoBehaviour
         }
     }
 
-    private IEnumerator Detach(GameObject other)
+    private void Attach(Transform host)
     {
-        yield return new WaitForSeconds(timeBeforeDetatch);
+        isAttached = true;
 
-        other.transform.SetParent(null);
-        currentStage++;
+        if (controller != null)
+        {
+            controllerEnabledBeforeAttach = controller.enabled;
+            controller.enabled = false;
+        }
+
+        if (rb != null)
+        {
+            bodyTypeBeforeAttach = rb.bodyType;
+            rb.linearVelocity = Vector2.zero;
+            rb.bodyType = RigidbodyType2D.Kinematic;
+        }
+
+        transform.SetParent(host, worldPositionStays: true);
+    }
+
+    private void Detach()
+    {
+        transform.SetParent(null, worldPositionStays: true);
+
+        // Everything Attach turned off has to come back on here, otherwise the
+        // detached object stays frozen for the rest of the level.
+        if (rb != null)
+        {
+            rb.bodyType = bodyTypeBeforeAttach;
+            rb.linearVelocity = Vector2.zero;
+        }
+
+        if (controller != null)
+        {
+            controller.enabled = controllerEnabledBeforeAttach;
+        }
+
+        isAttached = false;
+    }
+
+    private void ClaimPair(CombinerComponent attachment)
+    {
+        partner = attachment;
+        isMovingToCombine = true;
+
+        attachment.partner = this;
+        attachment.isMovingToCombine = true;
+    }
+
+    private void ReleasePair(CombinerComponent attachment)
+    {
+        partner = null;
+        isMovingToCombine = false;
+
+        if (attachment != null)
+        {
+            attachment.partner = null;
+            attachment.isMovingToCombine = false;
+        }
+    }
+
+    private void AdvanceStage()
+    {
+        if (currentStage < CombinationStage.Stage3)
+        {
+            currentStage++;
+        }
     }
 
     public CombinationStage GetCurrentStage()
