@@ -175,7 +175,6 @@ MonoBehaviour:
   downKey: 115
   leftKey: 97
   rightKey: 100
-  combinerComponent: {fileID: 3415938257698960301}
 --- !u!50 &30091341682300581
 Rigidbody2D:
   serializedVersion: 5
@@ -388,4 +387,4 @@ MonoBehaviour:
   drag: 3.5
   startColor: {r: 1, g: 0.76, b: 0.45, a: 0.75}
   endColor: {r: 0.85, g: 0.3, b: 0.18, a: 0}
-  sortingOrderOffset: -1
+  sortingOrderOffset: 0
