@@ -1,6 +1,13 @@
 using UnityEngine;
 using System.Collections;
 
+private enum CombinationStage
+{
+    1,
+    2,
+    3
+}
+
 public class CombinerComponent : MonoBehaviour
 {
     [SerializeField] public CombinationRuleSO currentType;
@@ -11,6 +18,8 @@ public class CombinerComponent : MonoBehaviour
 
     private Rigidbody2D rb;
     private bool isMovingToCombine = false;
+
+    private CombinationStage currentStage = CombinationStage.Stage1;
 
     private void Awake()
     {
@@ -149,5 +158,11 @@ public class CombinerComponent : MonoBehaviour
         yield return new WaitForSeconds(timeBeforeDetatch);
 
         other.transform.SetParent(null);
+        currentStage++;
+    }
+
+    public CombinationStage GetCurrentStage()
+    {
+        return currentStage;
     }
 }
