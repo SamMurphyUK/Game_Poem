@@ -1,11 +1,11 @@
 using UnityEngine;
 using System.Collections;
 
-private enum CombinationStage
+public enum CombinationStage
 {
-    1,
-    2,
-    3
+    Stage1,
+    Stage2,
+    Stage3
 }
 
 public class CombinerComponent : MonoBehaviour
