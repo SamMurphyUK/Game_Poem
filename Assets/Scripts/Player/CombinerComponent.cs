@@ -17,8 +17,9 @@ public class CombinerComponent : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player") || other.CompareTag("NPC"))
+        if (/*other.CompareTag("Player") ||*/ other.CompareTag("NPC"))
         {
+            Debug.Log("Collided with: " + other.name);
             var playerCombiner = other.GetComponent<CombinerComponent>();
 
             if (playerCombiner != null && playerCombiner.currentType.GetMatchingType() == currentType)

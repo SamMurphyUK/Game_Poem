@@ -693,6 +693,22 @@ PrefabInstance:
       value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 2156559277544376880, guid: 421a3bc049cd78a4099d24e612ad8a80, type: 3}
+      propertyPath: m_Size.x
+      value: 11.212955
+      objectReference: {fileID: 0}
+    - target: {fileID: 2156559277544376880, guid: 421a3bc049cd78a4099d24e612ad8a80, type: 3}
+      propertyPath: m_Size.y
+      value: 5.8647523
+      objectReference: {fileID: 0}
+    - target: {fileID: 2156559277544376880, guid: 421a3bc049cd78a4099d24e612ad8a80, type: 3}
+      propertyPath: m_Offset.x
+      value: 0.05942464
+      objectReference: {fileID: 0}
+    - target: {fileID: 2156559277544376880, guid: 421a3bc049cd78a4099d24e612ad8a80, type: 3}
+      propertyPath: m_Offset.y
+      value: -0.3565476
+      objectReference: {fileID: 0}
+    - target: {fileID: 2156559277544376880, guid: 421a3bc049cd78a4099d24e612ad8a80, type: 3}
       propertyPath: m_SpriteTilingProperty.border.w
       value: 0
       objectReference: {fileID: 0}
