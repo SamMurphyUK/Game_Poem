@@ -7,6 +7,7 @@ public class CombinerComponent : MonoBehaviour
     [SerializeField] private float movementSpeed = 5f;
     [SerializeField] private float rotationSpeed = 360f;
     [SerializeField] private float stoppingDistance = 0.1f;
+    [SerializeField] private float timeBeforeDetatch = 3f;
 
     private Rigidbody2D rb;
     private bool isMovingToCombine = false;
@@ -112,6 +113,8 @@ public class CombinerComponent : MonoBehaviour
 
         isMovingToCombine = false;
         other.GetComponent<CombinerComponent>().isMovingToCombine = false;
+
+        StartCoroutine(Detach(other));
     }
 
     private void RotateTowardsDirection(Transform target, Vector3 direction)
@@ -139,5 +142,12 @@ public class CombinerComponent : MonoBehaviour
         {
             spriteRenderer.sprite = outResult.sprite;
         }
+    }
+
+    private IEnumerator Detach(GameObject other)
+    {
+        yield return new WaitForSeconds(timeBeforeDetatch);
+
+        other.transform.SetParent(null);
     }
 }
