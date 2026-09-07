@@ -11,14 +11,22 @@ public class PlayerController : MonoBehaviour
 
     private Rigidbody2D rb;
     private Vector2 moveInput;
+    private CombinerComponent combinerComponent;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        combinerComponent = GetComponent<CombinerComponent>();
     }
 
     void Update()
     {
+        if(combinerComponent != null && combinerComponent.IsMovingToCombine())
+        {
+            moveInput = Vector2.zero;
+            return;
+        }
+
         moveInput = Vector2.zero;
 
         if (Input.GetKey(upKey)) moveInput.y += 1f;

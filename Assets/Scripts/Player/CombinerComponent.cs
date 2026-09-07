@@ -26,6 +26,11 @@ public class CombinerComponent : MonoBehaviour
         
     }
 
+    public bool IsMovingToCombine()
+    {
+        return isMovingToCombine;
+    }
+
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player") || other.CompareTag("NPC"))
@@ -81,6 +86,24 @@ public class CombinerComponent : MonoBehaviour
             // Combine both objects into the result
             Combine(result);
             other.GetComponent<CombinerComponent>().Combine(result);
+            
+            // Disable the other object's PlayerController/movement scripts BEFORE reparenting
+            PlayerController otherController = other.GetComponent<PlayerController>();
+            if (otherController != null)
+            {
+                otherController.enabled = false;
+            }
+            
+            // Disable the other object's rigidbody so it moves with the parent
+            Rigidbody2D otherRb = other.GetComponent<Rigidbody2D>();
+            if (otherRb != null)
+            {
+                otherRb.isKinematic = true;
+                otherRb.linearVelocity = Vector2.zero;
+            }
+            
+            // Make the other object a child of this object
+            other.transform.SetParent(transform, worldPositionStays: true);
         }
         else
         {
