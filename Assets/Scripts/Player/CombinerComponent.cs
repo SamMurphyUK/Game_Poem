@@ -23,7 +23,7 @@ public class CombinerComponent : MonoBehaviour
 
             if (playerCombiner != null && playerCombiner.currentType.GetMatchingType() == currentType)
             {
-                Combine(playerCombiner.currentType.GetResult());
+                Combine(currentType.GetResult());
             }
         }
     }

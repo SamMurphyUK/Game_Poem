@@ -692,10 +692,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
-    - target: {fileID: 2067279046881853296, guid: 421a3bc049cd78a4099d24e612ad8a80, type: 3}
-      propertyPath: m_TagString
-      value: Player
-      objectReference: {fileID: 0}
     - target: {fileID: 2156559277544376880, guid: 421a3bc049cd78a4099d24e612ad8a80, type: 3}
       propertyPath: m_SpriteTilingProperty.border.w
       value: 0
