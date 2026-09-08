@@ -18,6 +18,8 @@ public class CombinerComponent : MonoBehaviour
 
     private Rigidbody2D rb;
     private PlayerController controller;
+    private SpriteRenderer spriteRenderer;
+    private Transform cachedAnchor;
     private bool isMovingToCombine = false;
     private bool isAttached = false;
     private CombinerComponent partner;
@@ -34,7 +36,9 @@ public class CombinerComponent : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         controller = GetComponent<PlayerController>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
         audioSource = GetComponent<AudioSource>();
+        cachedAnchor = transform.Find("AnchorPoint");
     }
 
     public bool IsMovingToCombine()
@@ -48,8 +52,6 @@ public class CombinerComponent : MonoBehaviour
         {
             return;
         }
-
-        Debug.Log("Collided with: " + other.name);
 
         CombinerComponent otherCombiner = other.GetComponent<CombinerComponent>();
 
@@ -95,7 +97,11 @@ public class CombinerComponent : MonoBehaviour
             return;
         }
 
-        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
+        if (spriteRenderer == null)
+        {
+            spriteRenderer = GetComponent<SpriteRenderer>();
+        }
+
         if (spriteRenderer != null && type.sprite != null)
         {
             spriteRenderer.sprite = type.sprite;
@@ -149,8 +155,8 @@ public class CombinerComponent : MonoBehaviour
     {
         audioSource?.Play();
 
-        Transform thisAnchor = transform.Find("AnchorPoint");
-        Transform otherAnchor = attachment.transform.Find("AnchorPoint");
+        Transform thisAnchor = Anchor();
+        Transform otherAnchor = attachment.Anchor();
 
         if (thisAnchor == null || otherAnchor == null)
         {
@@ -451,5 +457,15 @@ public class CombinerComponent : MonoBehaviour
     public CombinationStage GetCurrentStage()
     {
         return currentStage;
+    }
+
+    private Transform Anchor()
+    {
+        if (cachedAnchor == null)
+        {
+            cachedAnchor = transform.Find("AnchorPoint");
+        }
+
+        return cachedAnchor;
     }
 }

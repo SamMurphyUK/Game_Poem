@@ -10,6 +10,12 @@ public static class DialogueClock
     private static bool openedStage3Walls;
     private static bool scheduledFirstPlayerWait;
 
+    private static PlayerController[] cachedPlayers;
+    private static float nextPlayerCacheTime;
+    private static CombinationStage cachedHighestStage;
+    private static int cachedHighestFrame = -1;
+    private const float PlayerCacheSeconds = 0.5f;
+
     public static float NpcCooldown(CombinationStage stage)
     {
         switch (stage)
@@ -83,14 +89,37 @@ public static class DialogueClock
         scheduledFirstPlayerWait = true;
     }
 
+    public static PlayerController[] Players(float now)
+    {
+        if (cachedPlayers == null || now >= nextPlayerCacheTime)
+        {
+            cachedPlayers = Object.FindObjectsByType<PlayerController>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+            nextPlayerCacheTime = now + PlayerCacheSeconds;
+        }
+
+        return cachedPlayers;
+    }
+
     public static CombinationStage HighestPlayerStage()
     {
-        CombinationStage highest = CombinationStage.Stage1;
-        CombinerComponent[] combiners = Object.FindObjectsByType<CombinerComponent>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
-        for (int i = 0; i < combiners.Length; i++)
+        int frame = Time.frameCount;
+        if (cachedHighestFrame == frame)
         {
-            CombinerComponent combiner = combiners[i];
-            if (combiner == null || combiner.GetComponent<PlayerController>() == null)
+            return cachedHighestStage;
+        }
+
+        CombinationStage highest = CombinationStage.Stage1;
+        PlayerController[] players = Players(Time.time);
+        for (int i = 0; i < players.Length; i++)
+        {
+            PlayerController player = players[i];
+            if (player == null)
+            {
+                continue;
+            }
+
+            CombinerComponent combiner = player.GetComponent<CombinerComponent>();
+            if (combiner == null)
             {
                 continue;
             }
@@ -102,6 +131,8 @@ public static class DialogueClock
             }
         }
 
+        cachedHighestStage = highest;
+        cachedHighestFrame = frame;
         return highest;
     }
 
@@ -121,22 +152,26 @@ public static class DialogueClock
         }
 
         openedStage3Walls = true;
-        Transform[] transforms = Object.FindObjectsByType<Transform>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
-        for (int i = 0; i < transforms.Length; i++)
-        {
-            Transform transform = transforms[i];
-            if (transform == null || !IsStage3Wall(transform.name))
-            {
-                continue;
-            }
+        OpenNamedWall("Wall (16)");
+        OpenNamedWall("Wall (17)");
+        OpenNamedWall("Wall (142)");
+        OpenNamedWall("Wall (143)");
+    }
 
-            Collider2D[] colliders = transform.GetComponents<Collider2D>();
-            for (int c = 0; c < colliders.Length; c++)
+    private static void OpenNamedWall(string name)
+    {
+        GameObject wall = GameObject.Find(name);
+        if (wall == null)
+        {
+            return;
+        }
+
+        Collider2D[] colliders = wall.GetComponents<Collider2D>();
+        for (int c = 0; c < colliders.Length; c++)
+        {
+            if (colliders[c] != null)
             {
-                if (colliders[c] != null)
-                {
-                    colliders[c].enabled = false;
-                }
+                colliders[c].enabled = false;
             }
         }
     }
@@ -147,5 +182,8 @@ public static class DialogueClock
         nextPlayerSpeakTime = 0f;
         scheduledFirstPlayerWait = false;
         openedStage3Walls = false;
+        cachedPlayers = null;
+        nextPlayerCacheTime = 0f;
+        cachedHighestFrame = -1;
     }
 }

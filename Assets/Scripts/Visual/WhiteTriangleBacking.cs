@@ -11,6 +11,10 @@ public class WhiteTriangleBacking : MonoBehaviour
 
     private SpriteRenderer body;
     private SpriteRenderer backing;
+    private Sprite lastSprite;
+    private Material lastMaterial;
+    private bool lastFlipX;
+    private bool lastFlipY;
 
     public static WhiteTriangleBacking Ensure(GameObject target)
     {
@@ -59,6 +63,21 @@ public class WhiteTriangleBacking : MonoBehaviour
         {
             return;
         }
+
+        bool same = lastSprite == body.sprite
+            && lastMaterial == body.sharedMaterial
+            && lastFlipX == body.flipX
+            && lastFlipY == body.flipY
+            && backing.sprite == body.sprite;
+        if (same)
+        {
+            return;
+        }
+
+        lastSprite = body.sprite;
+        lastMaterial = body.sharedMaterial;
+        lastFlipX = body.flipX;
+        lastFlipY = body.flipY;
 
         backing.sprite = body.sprite;
         backing.sharedMaterial = body.sharedMaterial;
