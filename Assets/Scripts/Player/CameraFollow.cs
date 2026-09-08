@@ -7,12 +7,12 @@ public class CameraFollow : MonoBehaviour
 
     void Awake()
     {
-        // SplitScreenCamera owns both viewports. Following one player from here
-        // would drag the other half of the screen along with WASD.
-        if (GetComponent<SplitScreenCamera>() != null)
-        {
-            enabled = false;
-        }
+        //// SplitScreenCamera owns both viewports. Following one player from here
+        //// would drag the other half of the screen along with WASD.
+        //if (GetComponent<SplitScreenCamera>() != null)
+        //{
+        //    enabled = false;
+        //}
     }
 
     void Update()

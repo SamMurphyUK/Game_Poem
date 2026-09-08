@@ -9353,7 +9353,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &648080926
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27822,6 +27822,7 @@ GameObject:
   - component: {fileID: 1857249940}
   - component: {fileID: 1857249943}
   - component: {fileID: 1857249945}
+  - component: {fileID: 1857249946}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -27954,7 +27955,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1857249939}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 84ddeda41b8fcab46a7f6d8318af06c5, type: 3}
   m_Name: 
@@ -27973,6 +27974,20 @@ MonoBehaviour:
   fadeDuration: 0.5
   dividerWidth: 0.01
   allowSharedCamera: 0
+--- !u!114 &1857249946
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1857249939}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a88f08540bf6fb478a66f405cbc9f69, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraFollow
+  player: {fileID: 1099870420}
+  offset: {x: 0, y: 0, z: -15}
 --- !u!1001 &1868024243
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -29118,7 +29133,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1940138041
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29359,7 +29374,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!20 &1963811021
 Camera:
   m_ObjectHideFlags: 0
@@ -32348,6 +32363,10 @@ PrefabInstance:
     - target: {fileID: 4434456574491360766, guid: 788630480c1cf9e43b235a8fbc1947c6, type: 3}
       propertyPath: m_Name
       value: Player 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4434456574491360766, guid: 788630480c1cf9e43b235a8fbc1947c6, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4576372826333137120, guid: 788630480c1cf9e43b235a8fbc1947c6, type: 3}
       propertyPath: m_LocalScale.x
