@@ -6220,7 +6220,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &648080926
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18697,6 +18697,7 @@ MonoBehaviour:
   minimumSize: 12
   fadeDuration: 0.5
   dividerWidth: 0.01
+  allowSharedCamera: 0
 --- !u!1 &1869117515
 GameObject:
   m_ObjectHideFlags: 0
@@ -19651,7 +19652,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!20 &1963811021
 Camera:
   m_ObjectHideFlags: 0

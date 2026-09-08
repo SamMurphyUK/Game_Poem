@@ -18,12 +18,14 @@ public class SplitScreenCamera : MonoBehaviour
     [SerializeField] private float minimumSize = 0f;
     [SerializeField] private float fadeDuration = 0.5f;
     [SerializeField] private float dividerWidth = 0.01f;
+    [SerializeField] private bool allowSharedCamera = false;
 
     private bool isSplitScreen = false;
     private Image fadeImage;
     private Image dividerImage;
     private bool isTransitioning = false;
-    private Camera originalCanvasCamera;
+    private Transform leftPlayer;
+    private Transform rightPlayer;
 
     private void Start()
     {
@@ -36,94 +38,99 @@ public class SplitScreenCamera : MonoBehaviour
             return;
         }
 
-        // Store the original canvas camera
-        if (backgroundCanvas != null)
-            originalCanvasCamera = backgroundCanvas.worldCamera;
-
-        // Setup fade image
         CreateFadeImage();
-        
-        // Setup divider line
         CreateDividerLine();
-        
-        // Apply the starting layout immediately so the first frame is already on
-        // the right cameras. Crossing the threshold later is the only fade.
+
         if (player1 == null || player2 == null)
         {
             Debug.LogError("Split screen players are not assigned!");
             return;
         }
 
-        isSplitScreen = Vector3.Distance(player1.position, player2.position) > splitDistanceThreshold;
+        AssignViewPlayers();
+
+        // Shared-camera / midpoint follow is what made WASD drag the other
+        // half of the level. Stay split unless a scene explicitly opts in.
+        isSplitScreen = !SplitScreenFollow.ShouldShareOneCamera(
+            allowSharedCamera,
+            false,
+            Vector3.Distance(player1.position, player2.position),
+            splitDistanceThreshold,
+            rejoinBuffer);
         SetupCameras();
+    }
+
+    private void AssignViewPlayers()
+    {
+        SplitScreenFollow.AssignSides(player1.position.x, player2.position.x, out bool player1OnLeft);
+        if (player1OnLeft)
+        {
+            leftPlayer = player1;
+            rightPlayer = player2;
+        }
+        else
+        {
+            leftPlayer = player2;
+            rightPlayer = player1;
+        }
     }
 
     private void CreateFadeImage()
     {
-        // Create a new Canvas for fade overlay
         GameObject fadeCanvasObj = new GameObject("FadeCanvas");
         Canvas fadeCanvas = fadeCanvasObj.AddComponent<Canvas>();
         fadeCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
         
-        // Create fade image
         GameObject fadeImageObj = new GameObject("FadeImage");
         fadeImageObj.transform.SetParent(fadeCanvasObj.transform);
         fadeImage = fadeImageObj.AddComponent<Image>();
         fadeImage.color = new Color(0, 0, 0, 0);
         
-        // Set image to fill screen
         RectTransform rectTransform = fadeImageObj.GetComponent<RectTransform>();
         rectTransform.anchorMin = Vector2.zero;
         rectTransform.anchorMax = Vector2.one;
         rectTransform.offsetMin = Vector2.zero;
         rectTransform.offsetMax = Vector2.zero;
         
-        // Set sorting order to be on top
         fadeCanvas.sortingOrder = 100;
     }
 
     private void CreateDividerLine()
     {
-        // Create a new Canvas for divider overlay
         GameObject dividerCanvasObj = new GameObject("DividerCanvas");
         Canvas dividerCanvas = dividerCanvasObj.AddComponent<Canvas>();
         dividerCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
         dividerCanvas.sortingOrder = 50;
         
-        // Create divider image
         GameObject dividerImageObj = new GameObject("DividerLine");
         dividerImageObj.transform.SetParent(dividerCanvasObj.transform);
         dividerImage = dividerImageObj.AddComponent<Image>();
         dividerImage.color = new Color(0, 0, 0, 1);
         
-        // Set divider to vertical center line
         RectTransform rectTransform = dividerImageObj.GetComponent<RectTransform>();
         rectTransform.anchorMin = new Vector2(0.5f, 0);
         rectTransform.anchorMax = new Vector2(0.5f, 1);
         rectTransform.offsetMin = new Vector2(-dividerWidth * Screen.width / 2f, 0);
         rectTransform.offsetMax = new Vector2(dividerWidth * Screen.width / 2f, 0);
         
-        // Initially hide divider
         dividerImage.enabled = false;
     }
 
     private void LateUpdate()
     {
-        if (player1 == null || player2 == null)
+        if (player1 == null || player2 == null || leftPlayer == null || rightPlayer == null)
             return;
 
-        // A transition owns the fade, not the cameras. Freezing the follow for the
-        // whole second leaves the camera behind a player who kept walking, and it
-        // then catches up in full view once the screen fades back in.
-        if (!isTransitioning)
+        if (allowSharedCamera && !isTransitioning)
         {
             float distanceBetweenPlayers = Vector3.Distance(player1.position, player2.position);
-
-            // Rejoining at a shorter distance than splitting keeps the pair from
-            // fading in and out every time they drift across a single threshold.
-            bool shouldBeSplitScreen = isSplitScreen
-                ? distanceBetweenPlayers > splitDistanceThreshold - rejoinBuffer
-                : distanceBetweenPlayers > splitDistanceThreshold;
+            bool shouldShare = SplitScreenFollow.ShouldShareOneCamera(
+                allowSharedCamera,
+                isSplitScreen,
+                distanceBetweenPlayers,
+                splitDistanceThreshold,
+                rejoinBuffer);
+            bool shouldBeSplitScreen = !shouldShare;
 
             if (shouldBeSplitScreen != isSplitScreen)
             {
@@ -142,13 +149,8 @@ public class SplitScreenCamera : MonoBehaviour
     {
         isTransitioning = true;
 
-        // Fade to black
         yield return StartCoroutine(FadeToBlack(fadeDuration));
-
-        // Switch camera setup
         SetupCameras();
-
-        // Fade from black
         yield return StartCoroutine(FadeFromBlack(fadeDuration));
 
         isTransitioning = false;
@@ -188,54 +190,36 @@ public class SplitScreenCamera : MonoBehaviour
     {
         if (isSplitScreen)
         {
-            // Enable split screen mode
             mainCamera.gameObject.SetActive(true);
             splitCamera.gameObject.SetActive(true);
 
-            // Set viewports for vertical split (left and right)
             mainCamera.rect = new Rect(0, 0, 0.5f, 1);
             splitCamera.rect = new Rect(0.5f, 0, 0.5f, 1);
 
-            // Single camera mode zooms the main camera, so match the split
-            // camera to it or the two halves show the world at different scales
             splitCamera.orthographic = mainCamera.orthographic;
             splitCamera.orthographicSize = mainCamera.orthographicSize;
 
-            // The screen is black at this point, so put both cameras straight onto
-            // their targets. Easing in from wherever they were left drags the world
-            // past a player who is standing perfectly still.
-            mainCamera.transform.position = player1.position + followOffset;
-            splitCamera.transform.position = player2.position + followOffset;
+            mainCamera.transform.position = SplitScreenFollow.FollowPosition(leftPlayer.position, followOffset);
+            splitCamera.transform.position = SplitScreenFollow.FollowPosition(rightPlayer.position, followOffset);
 
-            // Canvas stays on main camera - it will render on its half
-            if (backgroundCanvas != null)
-                backgroundCanvas.worldCamera = mainCamera;
-            
-            // Show divider line
             dividerImage.enabled = true;
         }
         else
         {
-            // Single camera mode
             mainCamera.rect = new Rect(0, 0, 1, 1);
             splitCamera.gameObject.SetActive(false);
 
-            mainCamera.transform.position = ((player1.position + player2.position) / 2f) + followOffset;
-            
-            // Canvas back to original camera or main camera
-            if (backgroundCanvas != null)
-                backgroundCanvas.worldCamera = originalCanvasCamera != null ? originalCanvasCamera : mainCamera;
-            
-            // Hide divider line
+            Vector3 midpoint = (player1.position + player2.position) / 2f;
+            mainCamera.transform.position = SplitScreenFollow.FollowPosition(midpoint, followOffset);
+
             dividerImage.enabled = false;
         }
     }
 
     private void UpdateSingleCamera()
     {
-        // When close, focus on the midpoint between both players
         Vector3 midpoint = (player1.position + player2.position) / 2f;
-        Vector3 targetPosition = midpoint + followOffset;
+        Vector3 targetPosition = SplitScreenFollow.FollowPosition(midpoint, followOffset);
 
         mainCamera.transform.position = Vector3.Lerp(
             mainCamera.transform.position,
@@ -243,8 +227,6 @@ public class SplitScreenCamera : MonoBehaviour
             smoothSpeed * Time.deltaTime
         );
 
-        // Adjust camera size to keep both players visible, but never zoom in
-        // past the framing the level is built for
         float distanceBetweenPlayers = Vector3.Distance(player1.position, player2.position);
         float requiredSize = Mathf.Max(minimumSize, (distanceBetweenPlayers / 2f) + padding);
         mainCamera.orthographicSize = Mathf.Lerp(
@@ -256,17 +238,16 @@ public class SplitScreenCamera : MonoBehaviour
 
     private void UpdateSplitScreen()
     {
-        // Hard-follow each player so walking one of them cannot drag the world
-        // past the other. A shared lerp from the last midpoint is what made the
-        // idle half look like it was moving.
-        if (mainCamera != null)
+        // Left viewport stays on the world-left player, right on the world-right
+        // player. Walking one of them must not translate the other half.
+        if (mainCamera != null && leftPlayer != null)
         {
-            mainCamera.transform.position = player1.position + followOffset;
+            mainCamera.transform.position = SplitScreenFollow.FollowPosition(leftPlayer.position, followOffset);
         }
 
-        if (splitCamera != null)
+        if (splitCamera != null && rightPlayer != null)
         {
-            splitCamera.transform.position = player2.position + followOffset;
+            splitCamera.transform.position = SplitScreenFollow.FollowPosition(rightPlayer.position, followOffset);
         }
     }
 }
