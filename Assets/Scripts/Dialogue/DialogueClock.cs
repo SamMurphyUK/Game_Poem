@@ -1,7 +1,8 @@
 using UnityEngine;
 
-// Shared NPC bark timing and the stage-3 wall openings. Cooldown is global so
-// one triangle talking blocks every other NPC for either player.
+// Shared NPC and player bark timing, plus the stage-3 wall openings. NPC
+// cooldown is global so one triangle talking blocks every other NPC. Player
+// idle lines share a second clock so either ship speaks about once a minute.
 public static class DialogueClock
 {
     private static float nextNpcSpeakTime;
