@@ -12,19 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 592cbed7791747e8acee9ebe5b617df1, type: 3}
   m_Name: NpcDialogue_Placeholder
   m_EditorClassIdentifier: Assembly-CSharp::NpcDialogueSO
-  defaultLines: []
+  defaultLines:
+  - 'Why hello there. '
   byStage:
   - stage: 0
     lines:
-    - I feel so pretty.
-    - Won't someone notice me?
+    - I have been standing here a long time.
+    - It's getting crowded in here.
   - stage: 1
     lines:
-    - It's getting crowded in here.
-    - I heard a theory ... that we won't stop spawning.
-    - WE WON'T STOP
-    - Hello there handsome.
+    - I think we should see other triangles.
+    - I'll never forget this.
   - stage: 2
     lines:
-    - Don't stop now.
-    - Don't let us stop you.
+    - I think about you.
+    - Stay. Please.
