@@ -131,6 +131,10 @@ public class NpcSpawnNode : MonoBehaviour
         {
             combiner.ApplyType(type);
             npc.name = type.name;
+            if (type.name != null && type.name.StartsWith("Light"))
+            {
+                WhiteTriangleBacking.Ensure(npc);
+            }
         }
         else
         {
