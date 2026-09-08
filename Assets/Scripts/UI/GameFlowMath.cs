@@ -6,11 +6,14 @@ public static class GameFlowMath
     public const float FadeSeconds = 1.5f;
     public const float SlowingIntervalSeconds = 120f;
     public const float SlowingHoldSeconds = 3f;
+    public const float SlowingTailDelaySeconds = 1.1f;
     public const float WinHoldSeconds = 2.5f;
 
     public const string LoveCountLine = "Roughly 100 triangles have found love. Are you struggling?";
     public const string EscapePromptLine = "Press Escape to end your suffering.";
     public const string SlowingLine = ">1,000 Triangles spawning. Computer....Slowing.";
+    public const string SlowingLead = ">1,000 Triangles spawning.";
+    public const string SlowingTail = "Computer....Slowing.";
     public const string StartMenuScene = "StartMenu";
     public const string PlayScene = "make no mistakes";
 
@@ -42,6 +45,16 @@ public static class GameFlowMath
         }
 
         return currentNextAt + intervalSeconds;
+    }
+
+    public static string SlowingTextAt(float holdElapsed)
+    {
+        if (holdElapsed < SlowingTailDelaySeconds)
+        {
+            return SlowingLead;
+        }
+
+        return SlowingLead + "\n\n" + SlowingTail;
     }
 
     public static bool IsWinTypeName(string typeName)

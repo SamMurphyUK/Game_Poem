@@ -126,7 +126,6 @@ public class GameFlow : MonoBehaviour
     {
         showingSlowing = true;
         message.enabled = false;
-        message.fontSize = 42;
 
         float elapsed = 0f;
         while (elapsed < GameFlowMath.FadeSeconds)
@@ -142,7 +141,8 @@ public class GameFlow : MonoBehaviour
         }
 
         fade.color = Color.black;
-        message.text = GameFlowMath.SlowingLine;
+        message.fontSize = 48;
+        message.text = GameFlowMath.SlowingTextAt(0f);
         message.enabled = true;
         Time.timeScale = 0f;
 
@@ -155,6 +155,7 @@ public class GameFlow : MonoBehaviour
                 yield break;
             }
 
+            message.text = GameFlowMath.SlowingTextAt(hold);
             hold += Time.unscaledDeltaTime;
             yield return null;
         }

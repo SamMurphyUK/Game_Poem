@@ -23,6 +23,10 @@ public static class GameFlowTests
         Expect(GameFlowMath.ShouldTriggerSlowing(120f, 120f), "slowing at 2 minutes");
         ExpectEqual(240f, GameFlowMath.FollowingSlowingAt(120f, 120f), "next slowing");
         Expect(GameFlowMath.SlowingLine.Contains("1,000 Triangles"), "slowing copy");
+        Expect(GameFlowMath.SlowingTextAt(0f) == GameFlowMath.SlowingLead, "slowing lead first");
+        Expect(GameFlowMath.SlowingTextAt(1.09f) == GameFlowMath.SlowingLead, "slowing still lead");
+        Expect(GameFlowMath.SlowingTextAt(1.1f).Contains(GameFlowMath.SlowingTail), "slowing tail after beat");
+        Expect(GameFlowMath.SlowingLead + " " + GameFlowMath.SlowingTail == GameFlowMath.SlowingLine, "slowing lines join");
         Expect(GameFlowMath.IsWinTypeName("DarkWin"), "dark win name");
         Expect(GameFlowMath.IsWinTypeName("LightWin"), "light win name");
         Expect(!GameFlowMath.IsWinTypeName("DarkDesire"), "desire is not win");
