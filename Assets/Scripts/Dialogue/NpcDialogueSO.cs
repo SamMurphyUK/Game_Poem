@@ -1,6 +1,8 @@
 using UnityEngine;
 
 // The lines an NPC can say, grouped by the combination stage the game has reached.
+// Create via Project window: Create → Game Poem → NPC Dialogue, then drag the
+// asset onto the NPC's Npc Dialogue component.
 [CreateAssetMenu(fileName = "NpcDialogue_", menuName = "Game Poem/NPC Dialogue")]
 public class NpcDialogueSO : ScriptableObject
 {

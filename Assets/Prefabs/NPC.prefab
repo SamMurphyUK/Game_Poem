@@ -216,12 +216,12 @@ MonoBehaviour:
   dialogue: {fileID: 11400000, guid: 64650a19314748018c37888acb1dc288, type: 2}
   secondsPerLine: 3.5
   silentWhileCombining: 1
-  speakRange: 5
-  silenceRange: 6.5
+  speakRange: 16
+  silenceRange: 22
   font: {fileID: 0}
-  heightAboveSprite: 0.4
-  labelWidth: 6
-  textSize: 0.35
+  heightAboveSprite: 0.8
+  labelWidth: 8
+  textSize: 0.55
   textColor: {r: 0.93, g: 0.9, b: 0.86, a: 1}
   sortingOrderOffset: 10
   fadeDuration: 0.35

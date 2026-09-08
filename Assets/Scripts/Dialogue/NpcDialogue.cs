@@ -1,9 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-// Speaks a line above this object while the player is close enough to hear it,
-// cycling through whichever lines are written for the combination stage the game
-// has reached. The label is built at runtime, so nothing has to be authored per NPC.
+// Speaks a line above this object while any player is close enough to hear it,
+// cycling through whichever lines are written for the combination stage the
+// game has reached. The label is built at runtime.
 public class NpcDialogue : MonoBehaviour
 {
     [Header("Lines")]
@@ -12,23 +12,24 @@ public class NpcDialogue : MonoBehaviour
     [SerializeField] private bool silentWhileCombining = true;
 
     [Header("Proximity")]
-    [SerializeField] private float speakRange = 5f;
-    [SerializeField] private float silenceRange = 6.5f;
+    [SerializeField] private float speakRange = 16f;
+    [SerializeField] private float silenceRange = 22f;
 
     [Header("Label")]
     [SerializeField] private Font font;
-    [SerializeField] private float heightAboveSprite = 0.4f;
-    [SerializeField] private float labelWidth = 6f;
-    [SerializeField] private float textSize = 0.35f;
+    [SerializeField] private float heightAboveSprite = 0.8f;
+    [SerializeField] private float labelWidth = 8f;
+    [SerializeField] private float textSize = 0.55f;
     [SerializeField] private Color textColor = new Color(0.93f, 0.9f, 0.86f, 1f);
     [SerializeField] private int sortingOrderOffset = 10;
     [SerializeField] private float fadeDuration = 0.35f;
 
     private const float PixelsPerUnit = 100f;
-    private const float RetryPlayerLookupAfter = 0.5f;
+    private const float RetryPlayerLookupAfter = 0.25f;
+    private const float LabelZ = -0.2f;
 
-    private Transform player;
-    private CombinerComponent playerCombiner;
+    private Transform listener;
+    private CombinerComponent stageSource;
     private CombinerComponent ownCombiner;
     private SpriteRenderer body;
 
@@ -47,8 +48,16 @@ public class NpcDialogue : MonoBehaviour
     {
         ownCombiner = GetComponent<CombinerComponent>();
         body = GetComponent<SpriteRenderer>();
-        shownStage = CurrentStage();
+        shownStage = CombinationStage.Stage1;
         lines = dialogue != null ? dialogue.GetLines(shownStage) : null;
+    }
+
+    private void OnDestroy()
+    {
+        if (labelRoot != null)
+        {
+            Destroy(labelRoot);
+        }
     }
 
     private void Update()
@@ -60,7 +69,7 @@ public class NpcDialogue : MonoBehaviour
 
         float deltaTime = Time.deltaTime;
 
-        FindPlayer(deltaTime);
+        FindListener(deltaTime);
         FollowGameState();
 
         speaking = HasLines() && WithinRange();
@@ -81,45 +90,58 @@ public class NpcDialogue : MonoBehaviour
         }
 
         float top = body != null ? body.bounds.max.y : transform.position.y;
-
-        labelRoot.transform.position = new Vector3(transform.position.x, top + heightAboveSprite, transform.position.z);
-
-        // NPCs are rotated to face each other while combining; the text must not follow.
+        labelRoot.transform.position = new Vector3(transform.position.x, top + heightAboveSprite, LabelZ);
         labelRoot.transform.rotation = Quaternion.identity;
     }
 
-    private void FindPlayer(float deltaTime)
+    private void FindListener(float deltaTime)
     {
-        if (player != null)
-        {
-            return;
-        }
-
         lookupTimer -= deltaTime;
-
-        if (lookupTimer > 0f)
+        if (lookupTimer > 0f && listener != null)
         {
             return;
         }
 
         lookupTimer = RetryPlayerLookupAfter;
 
-        GameObject found = GameObject.FindGameObjectWithTag("Player");
+        PlayerController[] players = FindObjectsByType<PlayerController>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+        Transform nearest = null;
+        CombinerComponent nearestCombiner = null;
+        CombinerComponent highest = null;
+        float best = float.PositiveInfinity;
 
-        if (found == null)
+        for (int i = 0; i < players.Length; i++)
         {
-            return;
+            PlayerController player = players[i];
+            if (player == null)
+            {
+                continue;
+            }
+
+            float distance = Vector2.Distance(transform.position, player.transform.position);
+            CombinerComponent combiner = player.GetComponent<CombinerComponent>();
+
+            if (distance < best)
+            {
+                best = distance;
+                nearest = player.transform;
+                nearestCombiner = combiner;
+            }
+
+            if (combiner != null && (highest == null || combiner.GetCurrentStage() > highest.GetCurrentStage()))
+            {
+                highest = combiner;
+            }
         }
 
-        player = found.transform;
-        playerCombiner = found.GetComponent<CombinerComponent>();
+        listener = nearest;
+        stageSource = highest != null ? highest : nearestCombiner;
     }
 
-    // The stage the player has reached is the state the dialogue reacts to, so a
-    // combination anywhere in the level changes what everyone nearby is saying.
+    // A combination anywhere in the level changes what nearby NPCs say.
     private CombinationStage CurrentStage()
     {
-        return playerCombiner != null ? playerCombiner.GetCurrentStage() : CombinationStage.Stage1;
+        return stageSource != null ? stageSource.GetCurrentStage() : CombinationStage.Stage1;
     }
 
     private void FollowGameState()
@@ -136,7 +158,6 @@ public class NpcDialogue : MonoBehaviour
         lineIndex = 0;
         lineTimer = 0f;
 
-        // Swap the line straight away when the state changes under the player's nose.
         if (HasLines() && labelRoot != null && labelRoot.activeSelf)
         {
             Show(lines[0]);
@@ -150,7 +171,7 @@ public class NpcDialogue : MonoBehaviour
 
     private bool WithinRange()
     {
-        if (player == null)
+        if (listener == null)
         {
             return false;
         }
@@ -160,10 +181,8 @@ public class NpcDialogue : MonoBehaviour
             return false;
         }
 
-        float distance = Vector2.Distance(transform.position, player.position);
-
-        // Two ranges so an NPC standing right on the edge does not flicker.
-        return speaking ? distance <= silenceRange : distance <= speakRange;
+        float distance = Vector2.Distance(transform.position, listener.position);
+        return NpcDialogueProximity.IsInRange(distance, speaking, speakRange, silenceRange);
     }
 
     private void AdvanceLine(float deltaTime)
@@ -227,6 +246,10 @@ public class NpcDialogue : MonoBehaviour
     private void BuildLabel()
     {
         Font drawWith = font != null ? font : Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        if (drawWith == null)
+        {
+            drawWith = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        }
 
         if (drawWith == null)
         {
@@ -234,8 +257,10 @@ public class NpcDialogue : MonoBehaviour
             return;
         }
 
+        // Keep the label in world space so NPC scale and wander rotation cannot
+        // squash or spin the text, and sit it closer to the camera than the walls.
         labelRoot = new GameObject(name + " Dialogue", typeof(RectTransform), typeof(Canvas));
-        labelRoot.transform.SetParent(transform, worldPositionStays: false);
+        labelRoot.transform.SetParent(null, worldPositionStays: true);
 
         RectTransform rootRect = (RectTransform)labelRoot.transform;
         rootRect.pivot = new Vector2(0.5f, 0f);
