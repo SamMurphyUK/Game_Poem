@@ -13,17 +13,17 @@ MonoBehaviour:
   m_Name: NpcDialogue_Placeholder
   m_EditorClassIdentifier: Assembly-CSharp::NpcDialogueSO
   defaultLines:
-  - I have nothing left to say.
+  - 'Why hello there. '
   byStage:
   - stage: 0
     lines:
     - I have been standing here a long time.
-    - Something of you is missing.
+    - It's getting crowded in here.
   - stage: 1
     lines:
-    - You are not what you were.
-    - It suits you, what you took.
+    - I think we should see other triangles.
+    - I'll never forget this.
   - stage: 2
     lines:
-    - There is little left to join.
-    - Stay. We are nearly whole.
+    - I think about you.
+    - Stay. Please.
