@@ -41,6 +41,11 @@ public class SplitScreenCamera : MonoBehaviour
         CreateFadeImage();
         CreateDividerLine();
 
+        // Do not rebind backgroundCanvas.worldCamera. That canvas still has
+        // leftover walls as Screen Space children, which then ride whichever
+        // camera it points at.
+        _ = backgroundCanvas;
+
         if (player1 == null || player2 == null)
         {
             Debug.LogError("Split screen players are not assigned!");
