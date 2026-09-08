@@ -38,12 +38,12 @@ public static class EmotionHierarchyTests
 
     static void TestEvolvedFormsAreRare()
     {
-        // Same weights as the NPC Spawn Node prefab: eight bases, four evolved, two wins.
+        // Same weights as the NPC Spawn Node prefab: 78% base, 20% evolved, 2% win.
         float[] weights =
         {
-            10f, 10f, 10f, 10f, 10f, 10f, 10f, 10f,
-            0.35f, 0.35f, 0.35f, 0.35f,
-            0.07f, 0.07f
+            39f, 39f, 39f, 39f, 39f, 39f, 39f, 39f,
+            20f, 20f, 20f, 20f,
+            4f, 4f
         };
 
         int n = 10000;
@@ -75,11 +75,9 @@ public static class EmotionHierarchyTests
         }
 
         Expect(bases + evolved + wins == n, "all rolls classified");
-        Expect(evolved < n * 0.05f, "evolved under 5% (got " + evolved + ")");
-        Expect(wins < n * 0.01f, "wins under 1% (got " + wins + ")");
-        Expect(bases > n * 0.9f, "bases over 90% (got " + bases + ")");
-        Expect(evolved > 0, "evolved can still spawn");
-        Expect(wins > 0, "wins can still spawn");
+        Expect(evolved >= n * 0.18f && evolved <= n * 0.22f, "evolved ~20% (got " + evolved + ")");
+        Expect(wins >= n * 0.015f && wins <= n * 0.025f, "wins ~2% (got " + wins + ")");
+        Expect(bases >= n * 0.75f && bases <= n * 0.81f, "bases ~78% (got " + bases + ")");
         Console.WriteLine("spawn mix over " + n + ": base=" + bases + " evolved=" + evolved + " win=" + wins);
     }
 
