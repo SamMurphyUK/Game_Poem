@@ -14,6 +14,7 @@ public class SplitScreenCamera : MonoBehaviour
     [SerializeField] private Vector3 followOffset = new Vector3(0, 0, -10);
     [SerializeField] private float smoothSpeed = 5f;
     [SerializeField] private float padding = 2f;
+    [SerializeField] private float minimumSize = 12f;
     [SerializeField] private float fadeDuration = 0.5f;
     [SerializeField] private float dividerWidth = 0.01f;
 
@@ -214,9 +215,10 @@ public class SplitScreenCamera : MonoBehaviour
             smoothSpeed * Time.deltaTime
         );
 
-        // Adjust camera size to keep both players visible
+        // Adjust camera size to keep both players visible, but never zoom in
+        // past the framing the level is built for
         float distanceBetweenPlayers = Vector3.Distance(player1.position, player2.position);
-        float requiredSize = (distanceBetweenPlayers / 2f) + padding;
+        float requiredSize = Mathf.Max(minimumSize, (distanceBetweenPlayers / 2f) + padding);
         mainCamera.orthographicSize = Mathf.Lerp(
             mainCamera.orthographicSize,
             requiredSize,
