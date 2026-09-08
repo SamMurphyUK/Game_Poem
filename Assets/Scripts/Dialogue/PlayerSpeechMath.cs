@@ -4,6 +4,7 @@ public static class PlayerSpeechMath
 {
     public const float MeanSeconds = 60f;
     public const float JitterSeconds = 20f;
+    public const string SpawnLine = "How gross.";
 
     public static readonly string[] Stage1Lines =
     {

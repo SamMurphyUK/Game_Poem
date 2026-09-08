@@ -12,6 +12,7 @@ public static class PlayerSpeechTests
         ExpectEqual(40f, PlayerSpeechMath.NextWaitSeconds(-2f), "wait clamps low");
         ExpectEqual(80f, PlayerSpeechMath.NextWaitSeconds(3f), "wait clamps high");
 
+        Expect(PlayerSpeechMath.SpawnLine == "How gross.", "spawn line");
         Expect(PlayerSpeechMath.Stage1Lines.Length == 2, "stage 1 count");
         Expect(PlayerSpeechMath.Stage2Lines.Length == 3, "stage 2 count");
         Expect(PlayerSpeechMath.Stage3Lines.Length == 4, "stage 3 count");

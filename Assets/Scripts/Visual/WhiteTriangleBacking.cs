@@ -1,14 +1,13 @@
 using UnityEngine;
 
-// Draws a white triangle behind this sprite so light-family ships keep the
-// offset backing the dark sprites already have painted into the PNG.
+// White plate behind a light-family ship. Uses the same sprite and URP 2D
+// material as the body — a runtime-generated sprite with the default material
+// is dropped by the 2D renderer, which is why the arrow player never showed
+// a backing under split-screen cameras.
 public class WhiteTriangleBacking : MonoBehaviour
 {
-    [SerializeField] private Vector3 offset = new Vector3(0.02f, 0.015f, 0.05f);
-    [SerializeField] private float scale = 1.2f;
-    [SerializeField] private int sortingOffset = 0;
-
-    private static Sprite sharedTriangle;
+    [SerializeField] private Vector3 offset = new Vector3(0.04f, 0.03f, 0.08f);
+    [SerializeField] private float scale = 1.28f;
 
     private SpriteRenderer body;
     private SpriteRenderer backing;
@@ -23,6 +22,7 @@ public class WhiteTriangleBacking : MonoBehaviour
         WhiteTriangleBacking existing = target.GetComponent<WhiteTriangleBacking>();
         if (existing != null)
         {
+            existing.SyncNow();
             return existing;
         }
 
@@ -33,30 +33,47 @@ public class WhiteTriangleBacking : MonoBehaviour
     {
         body = GetComponent<SpriteRenderer>();
         BuildBacking();
+        SyncNow();
     }
 
     private void LateUpdate()
     {
+        SyncNow();
+    }
+
+    public void SyncNow()
+    {
+        if (body == null)
+        {
+            body = GetComponent<SpriteRenderer>();
+        }
+
         if (backing == null || body == null)
         {
             return;
         }
 
-        backing.enabled = body.enabled && body.sprite != null;
-        if (!backing.enabled)
+        bool show = body.enabled && body.sprite != null;
+        backing.enabled = show;
+        if (!show)
         {
             return;
         }
 
-        backing.sortingLayerID = body.sortingLayerID;
-        // Stay on the same sort as the ship so the hearts tilemap cannot cover the
-        // white plate. Z offset keeps the plate just behind the colored triangle.
-        backing.sortingOrder = body.sortingOrder + sortingOffset;
+        backing.sprite = body.sprite;
+        backing.sharedMaterial = body.sharedMaterial;
         backing.color = Color.white;
+        backing.flipX = body.flipX;
+        backing.flipY = body.flipY;
+        backing.drawMode = body.drawMode;
+        backing.sortingLayerID = body.sortingLayerID;
+        backing.sortingOrder = body.sortingOrder;
+        backing.renderingLayerMask = body.renderingLayerMask;
+        backing.maskInteraction = body.maskInteraction;
+        backing.allowOcclusionWhenDynamic = false;
 
-        Vector2 size = body.sprite.bounds.size;
         backing.transform.localPosition = offset;
-        backing.transform.localScale = new Vector3(size.x * scale, size.y * scale, 1f);
+        backing.transform.localScale = new Vector3(scale, scale, 1f);
         backing.transform.localRotation = Quaternion.identity;
     }
 
@@ -68,44 +85,18 @@ public class WhiteTriangleBacking : MonoBehaviour
         }
 
         GameObject child = new GameObject("WhiteBacking");
+        child.layer = gameObject.layer;
         child.transform.SetParent(transform, false);
         child.transform.localPosition = offset;
+        child.transform.localScale = new Vector3(scale, scale, 1f);
         backing = child.AddComponent<SpriteRenderer>();
-        backing.sprite = SharedTriangle();
+        if (body != null)
+        {
+            backing.sharedMaterial = body.sharedMaterial;
+            backing.sprite = body.sprite;
+        }
+
         backing.color = Color.white;
-    }
-
-    private static Sprite SharedTriangle()
-    {
-        if (sharedTriangle != null)
-        {
-            return sharedTriangle;
-        }
-
-        const int size = 64;
-        Texture2D texture = new Texture2D(size, size, TextureFormat.RGBA32, false);
-        texture.filterMode = FilterMode.Bilinear;
-        texture.wrapMode = TextureWrapMode.Clamp;
-
-        Color clear = new Color(1f, 1f, 1f, 0f);
-        Color solid = Color.white;
-        for (int y = 0; y < size; y++)
-        {
-            // SpriteRenderer: y=0 is the bottom. Wide base there, point at the top (/_\).
-            float t = 1f - (y + 0.5f) / size;
-            float half = t * 0.5f;
-            float left = 0.5f - half;
-            float right = 0.5f + half;
-            for (int x = 0; x < size; x++)
-            {
-                float u = (x + 0.5f) / size;
-                texture.SetPixel(x, y, u >= left && u <= right ? solid : clear);
-            }
-        }
-
-        texture.Apply();
-        sharedTriangle = Sprite.Create(texture, new Rect(0f, 0f, size, size), new Vector2(0.5f, 0.5f), size);
-        sharedTriangle.name = "WhiteTriangle";
-        return sharedTriangle;
+        backing.allowOcclusionWhenDynamic = false;
     }
 }

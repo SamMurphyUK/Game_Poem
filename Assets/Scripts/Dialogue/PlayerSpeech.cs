@@ -18,7 +18,24 @@ public class PlayerSpeech : MonoBehaviour
 
     private void Start()
     {
+        SaySpawnLine();
         DialogueClock.EnsureFirstPlayerWait(Time.time, PlayerSpeechMath.NextWaitSeconds(Random.value));
+    }
+
+    public void SaySpawnLine()
+    {
+        if (bubble == null)
+        {
+            bubble = GetComponent<SpeechBubble>();
+        }
+
+        if (bubble == null || string.IsNullOrEmpty(PlayerSpeechMath.SpawnLine))
+        {
+            return;
+        }
+
+        bubble.Speak(PlayerSpeechMath.SpawnLine);
+        DialogueClock.MarkPlayerSpoke(Time.time, PlayerSpeechMath.NextWaitSeconds(Random.value));
     }
 
     private void Update()
