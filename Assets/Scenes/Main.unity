@@ -877,8 +877,8 @@ Camera:
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60
-  orthographic: 0
-  orthographic size: 5
+  orthographic: 1
+  orthographic size: 9.237604
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -970,10 +970,12 @@ MonoBehaviour:
   mainCamera: {fileID: 1857249941}
   splitCamera: {fileID: 457667201}
   backgroundCanvas: {fileID: 648080928}
-  splitDistanceThreshold: 15
+  splitDistanceThreshold: 6
+  rejoinBuffer: 2
   followOffset: {x: 0, y: 0, z: -15}
   smoothSpeed: 5
   padding: 2
+  minimumSize: 9.237604
   fadeDuration: 0.5
 --- !u!1 &2041326431
 GameObject:
