@@ -10,14 +10,14 @@ public class OpeningCutsceneManager : MonoBehaviour
     [SerializeField] private Transform cutscenePlayer2;
     [SerializeField] private CutscenePlayerController cutscenePlayer1Controller;
     [SerializeField] private CutscenePlayerController cutscenePlayer2Controller;
-
+    
     [Header("Camera")]
     [SerializeField] private Camera mainCamera;
-
+    
     [Header("UI")]
     [SerializeField] private Text instructionText;
     [SerializeField] private Image vignetteImage;
-
+    
     [Header("Timing")]
     [SerializeField] private float instructionDisplayTime = 3f;
     [SerializeField] private float mergeDetectionDistance = 1f;
@@ -25,13 +25,13 @@ public class OpeningCutsceneManager : MonoBehaviour
     [SerializeField] private float splitAnimationDuration = 1.5f;
     [SerializeField] private float floatInDuration = 2f;
     [SerializeField] private float fadeToBlackDuration = 1.5f;
-
+    
     [Header("Scene Transition")]
     [SerializeField] private string nextSceneName = "make no mistakes";
-
+    
     [Header("Effects")]
     [SerializeField] private Color blackVignetteColor = new Color(0, 0, 0, 0.7f);
-
+    
     private bool hasMerged = false;
     private Vector3 mergePoint;
     private bool cutsceneComplete = false;
@@ -53,13 +53,13 @@ public class OpeningCutsceneManager : MonoBehaviour
         Canvas fadeCanvas = fadeCanvasObj.AddComponent<Canvas>();
         fadeCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
         fadeCanvas.sortingOrder = 100;
-
+        
         // Create fade image
         GameObject fadeImageObj = new GameObject("FadeImage");
         fadeImageObj.transform.SetParent(fadeCanvasObj.transform);
         fadeImage = fadeImageObj.AddComponent<Image>();
         fadeImage.color = new Color(0, 0, 0, 0);
-
+        
         // Set image to fill screen
         RectTransform rectTransform = fadeImageObj.GetComponent<RectTransform>();
         rectTransform.anchorMin = Vector2.zero;
@@ -123,7 +123,7 @@ public class OpeningCutsceneManager : MonoBehaviour
         while (!hasMerged)
         {
             float distance = Vector3.Distance(cutscenePlayer1.position, cutscenePlayer2.position);
-
+            
             if (distance < mergeDetectionDistance)
             {
                 hasMerged = true;
