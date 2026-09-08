@@ -23,7 +23,8 @@ public class CombinerComponent : MonoBehaviour
     private CombinerComponent partner;
     private AudioSource audioSource;
 
-    private RigidbodyType2D bodyTypeBeforeAttach;
+    private RigidbodyType2D bodyTypeBeforeCombine;
+    private bool hasStoredBodyType;
     private bool controllerEnabledBeforeAttach;
 
     private CombinationStage currentStage = CombinationStage.Stage1;
@@ -128,22 +129,48 @@ public class CombinerComponent : MonoBehaviour
             yield break;
         }
 
-        // Move and rotate both objects towards each other until anchorpoints meet
-        while (Vector3.Distance(thisAnchor.position, otherAnchor.position) > stoppingDistance)
+        // Rotate first, then close. Doing both at once with the anchors sitting a
+        // unit off-centre makes the gap swing as fast as it shrinks, which is the
+        // visual jitter even after the bodies stop fighting the solver.
+        float approachTimeout = 3f;
+        float elapsed = 0f;
+
+        while (elapsed < approachTimeout)
         {
-            // Movement: move each object towards the other's anchorpoint
-            Vector3 thisToOtherDirection = (otherAnchor.position - thisAnchor.position).normalized;
-            transform.position += thisToOtherDirection * movementSpeed * Time.deltaTime;
+            Vector3 between = Flatten(attachment.transform.position - transform.position);
+            if (between.sqrMagnitude < 0.0001f)
+            {
+                break;
+            }
 
-            Vector3 otherToThisDirection = (thisAnchor.position - otherAnchor.position).normalized;
-            attachment.transform.position += otherToThisDirection * movementSpeed * Time.deltaTime;
+            RotateTowardsDirection(transform, between);
+            RotateTowardsDirection(attachment.transform, -between);
 
-            // Rotation: rotate each object to face towards the other's anchorpoint
-            RotateTowardsDirection(transform, thisToOtherDirection);
-            RotateTowardsDirection(attachment.transform, otherToThisDirection);
+            if (Faces(transform, between) && Faces(attachment.transform, -between))
+            {
+                break;
+            }
 
+            elapsed += Time.deltaTime;
             yield return null;
         }
+
+        float gap = AnchorGap(thisAnchor, otherAnchor);
+        while (gap > stoppingDistance && elapsed < approachTimeout)
+        {
+            float step = Mathf.Min(movementSpeed * Time.deltaTime, gap * 0.5f);
+            Vector3 close = Flatten(otherAnchor.position - thisAnchor.position).normalized;
+            transform.position += close * step;
+            attachment.transform.position -= close * step;
+
+            elapsed += Time.deltaTime;
+            yield return null;
+            gap = AnchorGap(thisAnchor, otherAnchor);
+        }
+
+        // Seat whatever the approach could not, so the pair always ends up together
+        // rather than a fraction of a unit apart.
+        attachment.transform.position += Flatten(thisAnchor.position - otherAnchor.position);
 
         // Get the result before combining
         CombinationRuleSO result = currentType.GetResult();
@@ -165,6 +192,10 @@ public class CombinerComponent : MonoBehaviour
         attachment.Combine(result);
         attachment.Attach(transform);
 
+        // The host drives itself again from here, so it needs its own body back.
+        // The attachment stays kinematic until it detaches.
+        RestoreBody();
+
         isMovingToCombine = false;
         attachment.isMovingToCombine = false;
 
@@ -179,9 +210,34 @@ public class CombinerComponent : MonoBehaviour
         ReleasePair(attachment);
     }
 
+    private static Vector3 Flatten(Vector3 value)
+    {
+        value.z = 0f;
+        return value;
+    }
+
+    private static float AnchorGap(Transform a, Transform b)
+    {
+        return Flatten(a.position - b.position).magnitude;
+    }
+
+    private bool Faces(Transform target, Vector3 direction)
+    {
+        if (direction.sqrMagnitude < 0.0001f)
+        {
+            return true;
+        }
+
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        return Mathf.Abs(Mathf.DeltaAngle(target.eulerAngles.z, angle)) < 1f;
+    }
+
     private void RotateTowardsDirection(Transform target, Vector3 direction)
     {
-        if (direction.magnitude < 0.01f) return;
+        if (direction.sqrMagnitude < 0.0001f)
+        {
+            return;
+        }
 
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         Quaternion targetRotation = Quaternion.AngleAxis(angle, Vector3.forward);
@@ -216,12 +272,7 @@ public class CombinerComponent : MonoBehaviour
             controller.enabled = false;
         }
 
-        if (rb != null)
-        {
-            bodyTypeBeforeAttach = rb.bodyType;
-            rb.linearVelocity = Vector2.zero;
-            rb.bodyType = RigidbodyType2D.Kinematic;
-        }
+        BeginScriptedMove();
 
         transform.SetParent(host, worldPositionStays: true);
     }
@@ -232,11 +283,7 @@ public class CombinerComponent : MonoBehaviour
 
         // Everything Attach turned off has to come back on here, otherwise the
         // detached object stays frozen for the rest of the level.
-        if (rb != null)
-        {
-            rb.bodyType = bodyTypeBeforeAttach;
-            rb.linearVelocity = Vector2.zero;
-        }
+        RestoreBody();
 
         if (controller != null)
         {
@@ -246,6 +293,76 @@ public class CombinerComponent : MonoBehaviour
         isAttached = false;
     }
 
+    // A scripted move writes transform.position outright, which a dynamic body
+    // treats as a teleport and the solver answers by shoving everything back out
+    // of the overlap it just created. Handing the body over as kinematic for the
+    // duration is what makes the approach read as one smooth movement.
+    private void BeginScriptedMove()
+    {
+        if (rb == null)
+        {
+            return;
+        }
+
+        if (!hasStoredBodyType)
+        {
+            bodyTypeBeforeCombine = rb.bodyType;
+            hasStoredBodyType = true;
+        }
+
+        rb.linearVelocity = Vector2.zero;
+        rb.angularVelocity = 0f;
+        rb.bodyType = RigidbodyType2D.Kinematic;
+    }
+
+    private void RestoreBody()
+    {
+        if (rb == null)
+        {
+            return;
+        }
+
+        if (hasStoredBodyType)
+        {
+            rb.bodyType = bodyTypeBeforeCombine;
+            hasStoredBodyType = false;
+        }
+
+        rb.linearVelocity = Vector2.zero;
+        rb.angularVelocity = 0f;
+    }
+
+    // Combining seats two solid colliders inside one another on purpose, so for as
+    // long as the pair is joined they must not try to push each other apart.
+    private void SetPairCollisions(CombinerComponent other, bool ignore)
+    {
+        if (other == null)
+        {
+            return;
+        }
+
+        Collider2D[] mine = GetComponentsInChildren<Collider2D>();
+        Collider2D[] theirs = other.GetComponentsInChildren<Collider2D>();
+
+        foreach (Collider2D a in mine)
+        {
+            if (a == null || a.isTrigger)
+            {
+                continue;
+            }
+
+            foreach (Collider2D b in theirs)
+            {
+                if (b == null || b.isTrigger)
+                {
+                    continue;
+                }
+
+                Physics2D.IgnoreCollision(a, b, ignore);
+            }
+        }
+    }
+
     private void ClaimPair(CombinerComponent attachment)
     {
         partner = attachment;
@@ -253,17 +370,24 @@ public class CombinerComponent : MonoBehaviour
 
         attachment.partner = this;
         attachment.isMovingToCombine = true;
+
+        BeginScriptedMove();
+        attachment.BeginScriptedMove();
+        SetPairCollisions(attachment, ignore: true);
     }
 
     private void ReleasePair(CombinerComponent attachment)
     {
         partner = null;
         isMovingToCombine = false;
+        RestoreBody();
 
         if (attachment != null)
         {
+            SetPairCollisions(attachment, ignore: false);
             attachment.partner = null;
             attachment.isMovingToCombine = false;
+            attachment.RestoreBody();
         }
     }
 
