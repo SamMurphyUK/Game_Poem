@@ -978,6 +978,7 @@ MonoBehaviour:
   minimumSize: 9.237604
   fadeDuration: 0.5
   dividerWidth: 0.01
+  allowSharedCamera: 0
 --- !u!1 &2041326431
 GameObject:
   m_ObjectHideFlags: 0
