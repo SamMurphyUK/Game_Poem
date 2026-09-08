@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 1393569012269727775}
   - component: {fileID: 6886375819103282439}
   - component: {fileID: -6581503217249716070}
+  - component: {fileID: 5729103847562011834}
   m_Layer: 0
   m_Name: Player 2
   m_TagString: Untagged
@@ -194,7 +195,33 @@ Rigidbody2D:
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
+--- !u!114 &5729103847562011834
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4434456574491360766}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87ba507869a04895af2f0d4bebd2cdb5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerExhaust
+  puffsPerSecond: 10
+  minimumSpeed: 0.25
+  topSpeed: 0
+  spawnOffset: 0.9
+  lifetime: 1.5
+  size: 0.14
+  sizeVariation: 0.35
+  growth: 1.7
+  ejectSpeed: 0.45
+  sideSpread: 0.2
+  drag: 3.5
+  startColor: {r: 1, g: 0.76, b: 0.45, a: 1}
+  endColor: {r: 0.85, g: 0.3, b: 0.18, a: 0}
+  sortingOrderOffset: 0
