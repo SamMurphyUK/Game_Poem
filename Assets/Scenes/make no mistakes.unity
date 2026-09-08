@@ -18622,7 +18622,8 @@ MonoBehaviour:
   mainCamera: {fileID: 1857249941}
   splitCamera: {fileID: 1963811021}
   backgroundCanvas: {fileID: 648080928}
-  splitDistanceThreshold: 15
+  splitDistanceThreshold: 6
+  rejoinBuffer: 2
   followOffset: {x: 0, y: 0, z: -20}
   smoothSpeed: 5
   padding: 2
