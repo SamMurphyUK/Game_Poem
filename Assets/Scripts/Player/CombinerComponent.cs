@@ -88,7 +88,7 @@ public class CombinerComponent : MonoBehaviour
             || currentType.GetMatchingType() == otherCombiner.currentType;
     }
 
-    private bool IsBusy()
+    public bool IsBusy()
     {
         return isMovingToCombine || isAttached || partner != null;
     }
