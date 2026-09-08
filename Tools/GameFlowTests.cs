@@ -19,6 +19,18 @@ public static class GameFlowTests
         ExpectEqual(1f, GameFlowMath.FadeAlpha(2f, 1.5f), "fade past end");
         Expect(GameFlowMath.LoveCountLine.Contains("100 triangles"), "love copy");
         Expect(GameFlowMath.EscapePromptLine.Contains("Escape"), "escape copy");
+        Expect(!GameFlowMath.ShouldTriggerSlowing(119.9f, 120f), "slowing not yet");
+        Expect(GameFlowMath.ShouldTriggerSlowing(120f, 120f), "slowing at 2 minutes");
+        ExpectEqual(240f, GameFlowMath.FollowingSlowingAt(120f, 120f), "next slowing");
+        Expect(GameFlowMath.SlowingLine.Contains("1,000 Triangles"), "slowing copy");
+        Expect(GameFlowMath.IsWinTypeName("DarkWin"), "dark win name");
+        Expect(GameFlowMath.IsWinTypeName("LightWin"), "light win name");
+        Expect(!GameFlowMath.IsWinTypeName("DarkDesire"), "desire is not win");
+        Expect(!GameFlowMath.IsWinTypeName(""), "empty is not win");
+        Expect(GameFlowMath.IsPlayerWin(true, false, true), "player plus npc win");
+        Expect(GameFlowMath.IsPlayerWin(false, true, true), "npc plus player win");
+        Expect(!GameFlowMath.IsPlayerWin(false, false, true), "npc plus npc is not a player win");
+        Expect(!GameFlowMath.IsPlayerWin(true, true, false), "players without win type");
 
         if (failures > 0)
         {

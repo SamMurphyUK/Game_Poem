@@ -15,7 +15,9 @@ public class GameFlow : MonoBehaviour
     private Image fade;
     private bool onMenu = true;
     private bool ending;
+    private bool showingSlowing;
     private float playElapsed;
+    private float nextSlowingAt = GameFlowMath.SlowingIntervalSeconds;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void Boot()
@@ -33,6 +35,15 @@ public class GameFlow : MonoBehaviour
 
         GameObject host = new GameObject("GameFlow");
         host.AddComponent<GameFlow>();
+    }
+
+    public static void NotifyPlayerWin()
+    {
+        GameFlow flow = Object.FindFirstObjectByType<GameFlow>();
+        if (flow != null)
+        {
+            flow.BeginWin();
+        }
     }
 
     private void Start()
@@ -67,19 +78,29 @@ public class GameFlow : MonoBehaviour
         }
 
         playElapsed += Time.deltaTime;
-        if (GameFlowMath.ShouldShowEscapePrompt(playElapsed))
+
+        if (!showingSlowing && GameFlowMath.ShouldTriggerSlowing(playElapsed, nextSlowingAt))
         {
-            message.text = GameFlowMath.EscapePromptLine;
-            message.enabled = true;
+            nextSlowingAt = GameFlowMath.FollowingSlowingAt(nextSlowingAt, GameFlowMath.SlowingIntervalSeconds);
+            StartCoroutine(ShowSlowing());
         }
-        else if (GameFlowMath.ShouldShowLoveCount(playElapsed))
+
+        if (!showingSlowing)
         {
-            message.text = GameFlowMath.LoveCountLine;
-            message.enabled = true;
-        }
-        else
-        {
-            message.enabled = false;
+            if (GameFlowMath.ShouldShowEscapePrompt(playElapsed))
+            {
+                message.text = GameFlowMath.EscapePromptLine;
+                message.enabled = true;
+            }
+            else if (GameFlowMath.ShouldShowLoveCount(playElapsed))
+            {
+                message.text = GameFlowMath.LoveCountLine;
+                message.enabled = true;
+            }
+            else
+            {
+                message.enabled = false;
+            }
         }
 
         if (GameFlowMath.CanEndRun(playElapsed) && Input.GetKeyDown(KeyCode.Escape))
@@ -88,9 +109,111 @@ public class GameFlow : MonoBehaviour
         }
     }
 
+    private void BeginWin()
+    {
+        if (ending)
+        {
+            return;
+        }
+
+        StopAllCoroutines();
+        showingSlowing = false;
+        Time.timeScale = 1f;
+        StartCoroutine(FadeToBlackWin());
+    }
+
+    private IEnumerator ShowSlowing()
+    {
+        showingSlowing = true;
+        message.enabled = false;
+        message.fontSize = 42;
+
+        float elapsed = 0f;
+        while (elapsed < GameFlowMath.FadeSeconds)
+        {
+            if (ending)
+            {
+                yield break;
+            }
+
+            elapsed += Time.unscaledDeltaTime;
+            fade.color = new Color(0f, 0f, 0f, GameFlowMath.FadeAlpha(elapsed, GameFlowMath.FadeSeconds));
+            yield return null;
+        }
+
+        fade.color = Color.black;
+        message.text = GameFlowMath.SlowingLine;
+        message.enabled = true;
+        Time.timeScale = 0f;
+
+        float hold = 0f;
+        while (hold < GameFlowMath.SlowingHoldSeconds)
+        {
+            if (ending)
+            {
+                Time.timeScale = 1f;
+                yield break;
+            }
+
+            hold += Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        Time.timeScale = 1f;
+        message.enabled = false;
+        elapsed = 0f;
+        while (elapsed < GameFlowMath.FadeSeconds)
+        {
+            if (ending)
+            {
+                yield break;
+            }
+
+            elapsed += Time.unscaledDeltaTime;
+            fade.color = new Color(0f, 0f, 0f, 1f - GameFlowMath.FadeAlpha(elapsed, GameFlowMath.FadeSeconds));
+            yield return null;
+        }
+
+        fade.color = new Color(0f, 0f, 0f, 0f);
+        message.fontSize = 56;
+        showingSlowing = false;
+    }
+
+    private IEnumerator FadeToBlackWin()
+    {
+        ending = true;
+        if (message != null)
+        {
+            message.enabled = false;
+        }
+
+        float elapsed = 0f;
+        while (elapsed < GameFlowMath.FadeSeconds)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float alpha = GameFlowMath.FadeAlpha(elapsed, GameFlowMath.FadeSeconds);
+            fade.color = new Color(0f, 0f, 0f, alpha);
+            yield return null;
+        }
+
+        fade.color = Color.black;
+        Time.timeScale = 1f;
+
+        float hold = 0f;
+        while (hold < GameFlowMath.WinHoldSeconds)
+        {
+            hold += Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        SceneManager.LoadScene(GameFlowMath.PlayScene, LoadSceneMode.Single);
+    }
+
     private IEnumerator FadeToMenu()
     {
         ending = true;
+        showingSlowing = false;
+        Time.timeScale = 1f;
         float elapsed = 0f;
         while (elapsed < GameFlowMath.FadeSeconds)
         {
@@ -109,6 +232,7 @@ public class GameFlow : MonoBehaviour
     {
         onMenu = true;
         playElapsed = 0f;
+        nextSlowingAt = GameFlowMath.SlowingIntervalSeconds;
         if (message != null)
         {
             message.enabled = false;
@@ -125,6 +249,8 @@ public class GameFlow : MonoBehaviour
     private void HideMenu()
     {
         onMenu = false;
+        playElapsed = 0f;
+        nextSlowingAt = GameFlowMath.SlowingIntervalSeconds;
         if (startMenu != null)
         {
             startMenu.SetActive(false);
@@ -141,7 +267,7 @@ public class GameFlow : MonoBehaviour
         canvasObject.transform.SetParent(transform, false);
         Canvas canvas = canvasObject.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = 200;
+        canvas.sortingOrder = 400;
         CanvasScaler scaler = canvasObject.AddComponent<CanvasScaler>();
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         scaler.referenceResolution = new Vector2(1920f, 1080f);
@@ -164,8 +290,8 @@ public class GameFlow : MonoBehaviour
         message.raycastTarget = false;
         message.enabled = false;
         RectTransform textRect = message.rectTransform;
-        textRect.anchorMin = new Vector2(0.08f, 0.35f);
-        textRect.anchorMax = new Vector2(0.92f, 0.65f);
+        textRect.anchorMin = new Vector2(0.08f, 0.28f);
+        textRect.anchorMax = new Vector2(0.92f, 0.72f);
         textRect.offsetMin = Vector2.zero;
         textRect.offsetMax = Vector2.zero;
 
@@ -179,6 +305,7 @@ public class GameFlow : MonoBehaviour
         fadeRect.anchorMax = Vector2.one;
         fadeRect.offsetMin = Vector2.zero;
         fadeRect.offsetMax = Vector2.zero;
+        fade.transform.SetAsFirstSibling();
     }
 
     private void OnDestroy()

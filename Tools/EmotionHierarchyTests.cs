@@ -118,6 +118,9 @@ public static class EmotionHierarchyTests
         ExpectSame(g.lightWin, g.lightDesiredPassion.ResultWith(g.lightJoyousEnvy), "light win result");
         Expect(g.darkPassion.ResultWith(g.darkJoy) == null, "illegal pair has no result");
         Expect(g.darkWin.ResultWith(g.darkEnviousJoy) == null, "win has no further result");
+        Expect(g.darkWin.IsWinType(), "dark win flagged");
+        Expect(g.lightWin.IsWinType(), "light win flagged");
+        Expect(!g.darkPassionateDesire.IsWinType(), "evolved is not win");
     }
 
     static void Expect(bool condition, string label)
