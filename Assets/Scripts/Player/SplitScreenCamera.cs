@@ -174,6 +174,11 @@ public class SplitScreenCamera : MonoBehaviour
             // Set viewports for vertical split (left and right)
             mainCamera.rect = new Rect(0, 0, 0.5f, 1);
             splitCamera.rect = new Rect(0.5f, 0, 0.5f, 1);
+
+            // Single camera mode zooms the main camera, so match the split
+            // camera to it or the two halves show the world at different scales
+            splitCamera.orthographic = mainCamera.orthographic;
+            splitCamera.orthographicSize = mainCamera.orthographicSize;
             
             // Canvas stays on main camera - it will render on its half
             if (backgroundCanvas != null)
