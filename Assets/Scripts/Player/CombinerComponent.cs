@@ -231,8 +231,10 @@ public class CombinerComponent : MonoBehaviour
 
         if (GameFlowMath.IsPlayerWin(controller != null, attachment.controller != null, result.IsWinType()))
         {
-            GameFlow.NotifyPlayerWin();
-            yield break;
+            if (GameFlow.NotifyPlayerWin())
+            {
+                yield break;
+            }
         }
 
         yield return new WaitForSeconds(timeBeforeDetatch);

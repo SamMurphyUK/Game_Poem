@@ -7,7 +7,6 @@ public static class GameFlowMath
     public const float SlowingIntervalSeconds = 120f;
     public const float SlowingHoldSeconds = 3f;
     public const float SlowingTailDelaySeconds = 1.1f;
-    public const float WinHoldSeconds = 2.5f;
 
     public const string LoveCountLine = "Roughly 100 triangles have found love. Are you struggling?";
     public const string EscapePromptLine = "Press Escape to end your suffering.";

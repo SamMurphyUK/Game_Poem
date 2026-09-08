@@ -15,6 +15,7 @@ public class GameFlow : MonoBehaviour
     private Image fade;
     private bool onMenu = true;
     private bool ending;
+    private bool won;
     private bool showingSlowing;
     private float playElapsed;
     private float nextSlowingAt = GameFlowMath.SlowingIntervalSeconds;
@@ -37,13 +38,16 @@ public class GameFlow : MonoBehaviour
         host.AddComponent<GameFlow>();
     }
 
-    public static void NotifyPlayerWin()
+    public static bool NotifyPlayerWin()
     {
         GameFlow flow = Object.FindFirstObjectByType<GameFlow>();
-        if (flow != null)
+        if (flow == null)
         {
-            flow.BeginWin();
+            return false;
         }
+
+        flow.BeginWin();
+        return true;
     }
 
     private void Start()
@@ -62,6 +66,17 @@ public class GameFlow : MonoBehaviour
 
     private void Update()
     {
+        if (won)
+        {
+            if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
+            {
+                Time.timeScale = 1f;
+                SceneManager.LoadScene(GameFlowMath.PlayScene, LoadSceneMode.Single);
+            }
+
+            return;
+        }
+
         if (ending)
         {
             return;
@@ -198,16 +213,8 @@ public class GameFlow : MonoBehaviour
         }
 
         fade.color = Color.black;
-        Time.timeScale = 1f;
-
-        float hold = 0f;
-        while (hold < GameFlowMath.WinHoldSeconds)
-        {
-            hold += Time.unscaledDeltaTime;
-            yield return null;
-        }
-
-        SceneManager.LoadScene(GameFlowMath.PlayScene, LoadSceneMode.Single);
+        Time.timeScale = 0f;
+        won = true;
     }
 
     private IEnumerator FadeToMenu()
