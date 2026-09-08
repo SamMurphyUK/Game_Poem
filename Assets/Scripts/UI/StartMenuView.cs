@@ -49,7 +49,7 @@ public static class StartMenuView
 
         AddLetter(titleRow.transform, font, "L");
         AddLetter(titleRow.transform, font, "O");
-        AddDownTriangle(titleRow.transform);
+        AddUpTriangle(titleRow.transform);
         AddLetter(titleRow.transform, font, "E");
 
         GameObject lucky = new GameObject("Lucky");
@@ -87,13 +87,13 @@ public static class StartMenuView
         layout.preferredHeight = 180f;
     }
 
-    private static void AddDownTriangle(Transform parent)
+    private static void AddUpTriangle(Transform parent)
     {
         GameObject go = new GameObject("V");
         go.transform.SetParent(parent, false);
         Image image = go.AddComponent<Image>();
         image.color = Color.white;
-        image.sprite = DownTriangleSprite();
+        image.sprite = UpTriangleSprite();
         image.raycastTarget = false;
         LayoutElement layout = go.AddComponent<LayoutElement>();
         layout.preferredWidth = 110f;
@@ -101,16 +101,16 @@ public static class StartMenuView
         layout.minWidth = 110f;
         layout.minHeight = 110f;
         RectTransform rect = go.GetComponent<RectTransform>();
-        rect.pivot = new Vector2(0.5f, 0.15f);
+        rect.pivot = new Vector2(0.5f, 0.5f);
     }
 
-    private static Sprite downTriangle;
+    private static Sprite upTriangle;
 
-    private static Sprite DownTriangleSprite()
+    private static Sprite UpTriangleSprite()
     {
-        if (downTriangle != null)
+        if (upTriangle != null)
         {
-            return downTriangle;
+            return upTriangle;
         }
 
         const int size = 64;
@@ -120,7 +120,9 @@ public static class StartMenuView
         Color solid = Color.white;
         for (int y = 0; y < size; y++)
         {
-            float t = 1f - (y + 0.5f) / size;
+            // UI Image treats this generated sprite with y=0 at the top of the
+            // rect, so a wide top in the texture reads as /_\ on screen.
+            float t = (y + 0.5f) / size;
             float half = t * 0.5f;
             float left = 0.5f - half;
             float right = 0.5f + half;
@@ -132,8 +134,8 @@ public static class StartMenuView
         }
 
         texture.Apply();
-        downTriangle = Sprite.Create(texture, new Rect(0f, 0f, size, size), new Vector2(0.5f, 0.5f), size);
-        downTriangle.name = "DownTriangle";
-        return downTriangle;
+        upTriangle = Sprite.Create(texture, new Rect(0f, 0f, size, size), new Vector2(0.5f, 0.5f), size);
+        upTriangle.name = "UpTriangle";
+        return upTriangle;
     }
 }

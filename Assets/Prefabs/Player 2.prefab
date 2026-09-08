@@ -339,9 +339,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e0f2a4b5c7d8394051627d8e9f0a1b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WhiteTriangleBacking
-  offset: {x: 0.07, y: 0.05, z: 0.04}
-  scale: 1.08
-  sortingOffset: -1
+  offset: {x: 0.02, y: 0.015, z: 0.05}
+  scale: 1.2
+  sortingOffset: 0
 --- !u!1 &8822001100220033014
 GameObject:
   m_ObjectHideFlags: 0

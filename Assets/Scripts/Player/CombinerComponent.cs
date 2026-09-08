@@ -100,6 +100,21 @@ public class CombinerComponent : MonoBehaviour
         {
             spriteRenderer.sprite = type.sprite;
         }
+
+        SyncWhiteBacking();
+    }
+
+    private void Start()
+    {
+        SyncWhiteBacking();
+    }
+
+    private void SyncWhiteBacking()
+    {
+        if (currentType != null && currentType.name != null && currentType.name.StartsWith("Light"))
+        {
+            WhiteTriangleBacking.Ensure(gameObject);
+        }
     }
 
     public bool IsBusy()

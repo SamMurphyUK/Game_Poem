@@ -4,9 +4,9 @@ using UnityEngine;
 // offset backing the dark sprites already have painted into the PNG.
 public class WhiteTriangleBacking : MonoBehaviour
 {
-    [SerializeField] private Vector3 offset = new Vector3(0.07f, 0.05f, 0.04f);
-    [SerializeField] private float scale = 1.08f;
-    [SerializeField] private int sortingOffset = -1;
+    [SerializeField] private Vector3 offset = new Vector3(0.02f, 0.015f, 0.05f);
+    [SerializeField] private float scale = 1.2f;
+    [SerializeField] private int sortingOffset = 0;
 
     private static Sprite sharedTriangle;
 
@@ -49,6 +49,8 @@ public class WhiteTriangleBacking : MonoBehaviour
         }
 
         backing.sortingLayerID = body.sortingLayerID;
+        // Stay on the same sort as the ship so the hearts tilemap cannot cover the
+        // white plate. Z offset keeps the plate just behind the colored triangle.
         backing.sortingOrder = body.sortingOrder + sortingOffset;
         backing.color = Color.white;
 
@@ -89,7 +91,8 @@ public class WhiteTriangleBacking : MonoBehaviour
         Color solid = Color.white;
         for (int y = 0; y < size; y++)
         {
-            float t = (y + 0.5f) / size;
+            // SpriteRenderer: y=0 is the bottom. Wide base there, point at the top (/_\).
+            float t = 1f - (y + 0.5f) / size;
             float half = t * 0.5f;
             float left = 0.5f - half;
             float right = 0.5f + half;
