@@ -5,7 +5,9 @@ using UnityEngine;
 public static class DialogueClock
 {
     private static float nextNpcSpeakTime;
+    private static float nextPlayerSpeakTime;
     private static bool openedStage3Walls;
+    private static bool scheduledFirstPlayerWait;
 
     public static float NpcCooldown(CombinationStage stage)
     {
@@ -35,6 +37,49 @@ public static class DialogueClock
     public static void AllowNpcSpeakAfterCombine(float now)
     {
         nextNpcSpeakTime = now;
+    }
+
+    public static bool CanPlayerSpeak(float now)
+    {
+        return now >= nextPlayerSpeakTime;
+    }
+
+    public static void EnsureFirstPlayerWait(float now, float waitSeconds)
+    {
+        if (scheduledFirstPlayerWait)
+        {
+            return;
+        }
+
+        scheduledFirstPlayerWait = true;
+        if (waitSeconds < 0f)
+        {
+            waitSeconds = 0f;
+        }
+
+        nextPlayerSpeakTime = now + waitSeconds;
+    }
+
+    public static bool TryClaimPlayerSpeak(float now, float waitSeconds)
+    {
+        if (now < nextPlayerSpeakTime)
+        {
+            return false;
+        }
+
+        MarkPlayerSpoke(now, waitSeconds);
+        return true;
+    }
+
+    public static void MarkPlayerSpoke(float now, float waitSeconds)
+    {
+        if (waitSeconds < 0f)
+        {
+            waitSeconds = 0f;
+        }
+
+        nextPlayerSpeakTime = now + waitSeconds;
+        scheduledFirstPlayerWait = true;
     }
 
     public static CombinationStage HighestPlayerStage()
@@ -98,6 +143,8 @@ public static class DialogueClock
     public static void ResetForTests()
     {
         nextNpcSpeakTime = 0f;
+        nextPlayerSpeakTime = 0f;
+        scheduledFirstPlayerWait = false;
         openedStage3Walls = false;
     }
 }
