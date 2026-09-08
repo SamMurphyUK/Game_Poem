@@ -120,3 +120,32 @@ MonoBehaviour:
     m_Bits: 1
   placementTries: 8
   wanderRadius: 0
+  spawnTable:
+  - type: {fileID: 11400000, guid: 193044960908473a8e65d9adf1c14ed8, type: 2}
+    weight: 10
+  - type: {fileID: 11400000, guid: 989652744e7f4812814560b0e7f86fc1, type: 2}
+    weight: 10
+  - type: {fileID: 11400000, guid: c818e73b3e294fe6a3ace823506bb7a4, type: 2}
+    weight: 10
+  - type: {fileID: 11400000, guid: 77152e417b2a430d8fada4c4625a0412, type: 2}
+    weight: 10
+  - type: {fileID: 11400000, guid: 2a274038bdf44f378dadee44f0b02512, type: 2}
+    weight: 10
+  - type: {fileID: 11400000, guid: b970d7ca636a491f924d171fab1d3776, type: 2}
+    weight: 10
+  - type: {fileID: 11400000, guid: 7236d5ca641c4f23b2d91e755b4155b4, type: 2}
+    weight: 10
+  - type: {fileID: 11400000, guid: b6e286fd01a247148d49f99bf7c877c6, type: 2}
+    weight: 10
+  - type: {fileID: 11400000, guid: 907bc10793704dfe9f6af3991515957e, type: 2}
+    weight: 0.35
+  - type: {fileID: 11400000, guid: ecde5f7ae40c43c282c72e7b626d8be0, type: 2}
+    weight: 0.35
+  - type: {fileID: 11400000, guid: ffd1114263b64c1480af8703067fc452, type: 2}
+    weight: 0.35
+  - type: {fileID: 11400000, guid: b89daf1dd1944cb590ce9ab69bc6fd56, type: 2}
+    weight: 0.35
+  - type: {fileID: 11400000, guid: b7768ce777e742f28804d6e716c4ec1b, type: 2}
+    weight: 0.07
+  - type: {fileID: 11400000, guid: d2a6be6235894fafb5f1da153b749980, type: 2}
+    weight: 0.07

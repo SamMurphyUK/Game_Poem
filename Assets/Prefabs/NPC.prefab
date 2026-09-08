@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 2994468734173236518}
   - component: {fileID: 4185027739160458213}
   - component: {fileID: 6123988471123344553}
+  - component: {fileID: 6123988471123344554}
   m_Layer: 0
   m_Name: NPC
   m_TagString: NPC
@@ -196,7 +197,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 750eb243063084742ad27448a5dcfb69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CombinerComponent
-  currentType: {fileID: 11400000, guid: eff42dcb5bd729248b1e120f80619172, type: 2}
+  currentType: {fileID: 11400000, guid: 193044960908473a8e65d9adf1c14ed8, type: 2}
   movementSpeed: 5
   rotationSpeed: 360
   stoppingDistance: 0.1
@@ -214,17 +215,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NpcDialogue
   dialogue: {fileID: 11400000, guid: 64650a19314748018c37888acb1dc288, type: 2}
-  secondsPerLine: 3.5
   silentWhileCombining: 1
-  speakRange: 5
-  silenceRange: 6.5
+  speakRange: 16
+  silenceRange: 22
+--- !u!114 &6123988471123344554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8262647414866110968}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e8a1c3b7d924f10a2b4c6d8e0f12345, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpeechBubble
   font: {fileID: 0}
-  heightAboveSprite: 0.4
-  labelWidth: 6
-  textSize: 0.35
-  textColor: {r: 0.93, g: 0.9, b: 0.86, a: 1}
+  heightAboveSprite: 0.8
+  labelWidth: 8
+  textSize: 0.55
+  textColor: {r: 0, g: 0, b: 0, a: 1}
   sortingOrderOffset: 10
   fadeDuration: 0.35
+  lingerSeconds: 4
 --- !u!114 &6123988471123344553
 MonoBehaviour:
   m_ObjectHideFlags: 0

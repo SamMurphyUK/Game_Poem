@@ -27,6 +27,9 @@ public class NpcSpawnNode : MonoBehaviour
     [Header("Wander")]
     [SerializeField] private float wanderRadius = 0f;
 
+    [Header("Emotions")]
+    [SerializeField] private List<NpcSpawnEntry> spawnTable = new List<NpcSpawnEntry>();
+
     private readonly List<GameObject> live = new List<GameObject>();
     private float spawnTimer;
 
@@ -77,6 +80,36 @@ public class NpcSpawnNode : MonoBehaviour
         live.Clear();
     }
 
+    private CombinationRuleSO PickSpawnType()
+    {
+        if (spawnTable == null || spawnTable.Count == 0)
+        {
+            return null;
+        }
+
+        float[] weights = new float[spawnTable.Count];
+        for (int i = 0; i < spawnTable.Count; i++)
+        {
+            NpcSpawnEntry entry = spawnTable[i];
+            if (entry == null || entry.type == null)
+            {
+                weights[i] = 0f;
+            }
+            else
+            {
+                weights[i] = entry.weight;
+            }
+        }
+
+        int index = NpcSpawnMath.PickWeightedIndex(weights, Random.value);
+        if (index < 0)
+        {
+            return null;
+        }
+
+        return spawnTable[index].type;
+    }
+
     public bool TrySpawn()
     {
         if (npcPrefab == null || !NpcSpawnMath.CanKeepSpawning(live.Count, maxAlive))
@@ -91,7 +124,18 @@ public class NpcSpawnNode : MonoBehaviour
 
         GameObject npc = Instantiate(npcPrefab, point, Quaternion.identity);
         npc.transform.localScale = spawnScale;
-        npc.name = npcPrefab.name;
+
+        CombinationRuleSO type = PickSpawnType();
+        CombinerComponent combiner = npc.GetComponent<CombinerComponent>();
+        if (type != null && combiner != null)
+        {
+            combiner.ApplyType(type);
+            npc.name = type.name;
+        }
+        else
+        {
+            npc.name = npcPrefab.name;
+        }
 
         NpcWander wander = npc.GetComponent<NpcWander>();
         if (wander == null)
@@ -155,4 +199,11 @@ public class NpcSpawnNode : MonoBehaviour
             Gizmos.DrawWireSphere(transform.position, wanderRadius);
         }
     }
+}
+
+[System.Serializable]
+public class NpcSpawnEntry
+{
+    public CombinationRuleSO type;
+    public float weight = 1f;
 }
