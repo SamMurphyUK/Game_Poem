@@ -4891,7 +4891,6 @@ GameObject:
   - component: {fileID: 1857249941}
   - component: {fileID: 1857249940}
   - component: {fileID: 1857249943}
-  - component: {fileID: 1857249944}
   - component: {fileID: 1857249945}
   m_Layer: 0
   m_Name: Main Camera
@@ -4942,8 +4941,8 @@ Camera:
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60
-  orthographic: 0
-  orthographic size: 5
+  orthographic: 1
+  orthographic size: 12
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -5018,20 +5017,6 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
---- !u!114 &1857249944
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1857249939}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0a88f08540bf6fb478a66f405cbc9f69, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CameraFollow
-  player: {fileID: 1099870420}
-  offset: {x: 0, y: 0, z: -20}
 --- !u!114 &1857249945
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5168,16 +5153,14 @@ GameObject:
   m_Component:
   - component: {fileID: 1963811025}
   - component: {fileID: 1963811021}
-  - component: {fileID: 1963811024}
   - component: {fileID: 1963811023}
-  - component: {fileID: 1963811022}
   m_Layer: 0
   m_Name: Splitscreen
-  m_TagString: MainCamera
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!20 &1963811021
 Camera:
   m_ObjectHideFlags: 0
@@ -5212,9 +5195,9 @@ Camera:
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60
-  orthographic: 0
-  orthographic size: 5
-  m_Depth: -1
+  orthographic: 1
+  orthographic size: 12
+  m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -5229,20 +5212,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!114 &1963811022
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1963811020}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0a88f08540bf6fb478a66f405cbc9f69, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CameraFollow
-  player: {fileID: 1099870420}
-  offset: {x: 0, y: 0, z: -20}
 --- !u!114 &1963811023
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5287,14 +5256,6 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
---- !u!81 &1963811024
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1963811020}
-  m_Enabled: 1
 --- !u!4 &1963811025
 Transform:
   m_ObjectHideFlags: 0
