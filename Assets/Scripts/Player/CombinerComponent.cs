@@ -229,6 +229,14 @@ public class CombinerComponent : MonoBehaviour
         isMovingToCombine = false;
         attachment.isMovingToCombine = false;
 
+        if (GameFlowMath.IsPlayerWin(controller != null, attachment.controller != null, result.IsWinType()))
+        {
+            if (GameFlow.NotifyPlayerWin())
+            {
+                yield break;
+            }
+        }
+
         yield return new WaitForSeconds(timeBeforeDetatch);
 
         if (attachment != null)

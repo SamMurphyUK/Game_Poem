@@ -48,4 +48,9 @@ public class CombinationRuleSO : ScriptableObject
 
         return other.result;
     }
+
+    public bool IsWinType()
+    {
+        return GameFlowMath.IsWinTypeName(name);
+    }
 }
