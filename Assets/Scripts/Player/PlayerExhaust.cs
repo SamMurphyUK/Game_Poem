@@ -23,7 +23,7 @@ public class PlayerExhaust : MonoBehaviour
     [SerializeField] private float drag = 3.5f;
 
     [Header("Colour")]
-    [SerializeField] private Color startColor = new Color(1f, 0.76f, 0.45f, 0.75f);
+    [SerializeField] private Color startColor = new Color(1f, 0.76f, 0.45f, 1f);
     [SerializeField] private Color endColor = new Color(0.85f, 0.3f, 0.18f, 0f);
     [SerializeField] private int sortingOrderOffset = -1;
 
@@ -45,6 +45,7 @@ public class PlayerExhaust : MonoBehaviour
     private readonly Stack<Puff> pool = new Stack<Puff>();
 
     private SpriteRenderer bodyRenderer;
+    private Rigidbody2D body;
     private Transform holder;
     private Vector3 lastPosition;
     private float pendingPuffs;
@@ -52,6 +53,7 @@ public class PlayerExhaust : MonoBehaviour
     private void Awake()
     {
         bodyRenderer = GetComponent<SpriteRenderer>();
+        body = GetComponent<Rigidbody2D>();
         lastPosition = transform.position;
 
         if (topSpeed <= 0f)
@@ -90,8 +92,24 @@ public class PlayerExhaust : MonoBehaviour
         // A scene load or a snap to a new position must not dump a whole trail at once.
         bool teleported = movement.magnitude > topSpeed * deltaTime * 8f;
 
-        Emit(teleported ? Vector2.zero : movement / deltaTime, deltaTime);
+        Emit(teleported ? Vector2.zero : Velocity(movement, deltaTime), deltaTime);
         AgePuffs(deltaTime);
+    }
+
+    // PlayerController writes linearVelocity in FixedUpdate and the body is not
+    // interpolated, so transform.position often does not move on a given Update.
+    // Reading the rigidbody keeps the trail going on those frames. Transform
+    // delta still wins during scripted combines, when the body is kinematic.
+    private Vector2 Velocity(Vector2 movement, float deltaTime)
+    {
+        Vector2 fromTransform = movement / deltaTime;
+        if (body == null || !body.simulated)
+        {
+            return fromTransform;
+        }
+
+        Vector2 fromBody = body.linearVelocity;
+        return fromBody.sqrMagnitude >= fromTransform.sqrMagnitude ? fromBody : fromTransform;
     }
 
     private void Emit(Vector2 velocity, float deltaTime)
@@ -100,7 +118,6 @@ public class PlayerExhaust : MonoBehaviour
 
         if (speed < minimumSpeed)
         {
-            pendingPuffs = 0f;
             return;
         }
 
@@ -124,8 +141,11 @@ public class PlayerExhaust : MonoBehaviour
         Puff puff = Take();
 
         Vector3 origin = transform.position + (Vector3)(back * BodyExtentAlong(back) * spawnOffset);
-        origin.z = transform.position.z;
+        // Sit just behind the player sprite and well in front of the hearts floor
+        // (players at z=1, tilemap at z=2) so the trail cannot be sorted under it.
+        origin.z = transform.position.z + 0.15f;
         puff.tr.position = origin;
+        Style(puff.sprite);
 
         puff.velocity = back * (speed * ejectSpeed * Random.Range(0.75f, 1.25f))
             + side * (speed * sideSpread * Random.Range(-1f, 1f));
@@ -181,10 +201,27 @@ public class PlayerExhaust : MonoBehaviour
 
         SpriteRenderer sprite = instance.AddComponent<SpriteRenderer>();
         sprite.sprite = BallSprite();
+        Style(sprite);
+
+        return new Puff
+        {
+            instance = instance,
+            tr = instance.transform,
+            sprite = sprite
+        };
+    }
+
+    private void Style(SpriteRenderer sprite)
+    {
+        if (sprite == null)
+        {
+            return;
+        }
+
+        sprite.allowOcclusionWhenDynamic = false;
 
         if (bodyRenderer != null)
         {
-            // Borrowing the body's material keeps the puffs shaded like the rest of the art.
             sprite.sharedMaterial = bodyRenderer.sharedMaterial;
             sprite.sortingLayerID = bodyRenderer.sortingLayerID;
             sprite.sortingOrder = bodyRenderer.sortingOrder + sortingOrderOffset;
@@ -193,13 +230,6 @@ public class PlayerExhaust : MonoBehaviour
         {
             sprite.sortingOrder = sortingOrderOffset;
         }
-
-        return new Puff
-        {
-            instance = instance,
-            tr = instance.transform,
-            sprite = sprite
-        };
     }
 
     private Transform Holder()
