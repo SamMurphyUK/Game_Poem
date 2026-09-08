@@ -977,6 +977,7 @@ MonoBehaviour:
   padding: 2
   minimumSize: 9.237604
   fadeDuration: 0.5
+  dividerWidth: 0.01
 --- !u!1 &2041326431
 GameObject:
   m_ObjectHideFlags: 0

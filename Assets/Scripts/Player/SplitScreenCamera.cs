@@ -48,11 +48,13 @@ public class SplitScreenCamera : MonoBehaviour
         
         // Apply the starting layout immediately so the first frame is already on
         // the right cameras. Crossing the threshold later is the only fade.
-        if (player1 != null && player2 != null)
+        if (player1 == null || player2 == null)
         {
-            isSplitScreen = Vector3.Distance(player1.position, player2.position) > splitDistanceThreshold;
+            Debug.LogError("Split screen players are not assigned!");
+            return;
         }
 
+        isSplitScreen = Vector3.Distance(player1.position, player2.position) > splitDistanceThreshold;
         SetupCameras();
     }
 

@@ -25,6 +25,7 @@ public class CombinerComponent : MonoBehaviour
 
     private RigidbodyType2D bodyTypeBeforeCombine;
     private bool hasStoredBodyType;
+    private bool simulatedBeforeAttach = true;
     private bool controllerEnabledBeforeAttach;
 
     private CombinationStage currentStage = CombinationStage.Stage1;
@@ -274,12 +275,26 @@ public class CombinerComponent : MonoBehaviour
 
         BeginScriptedMove();
 
+        // Unity 2D will not simulate a Rigidbody2D that is parented to another
+        // Rigidbody2D. Turning simulation off here folds this collider into the
+        // host so the pair moves as one body instead of two fighting solvers.
+        if (rb != null)
+        {
+            simulatedBeforeAttach = rb.simulated;
+            rb.simulated = false;
+        }
+
         transform.SetParent(host, worldPositionStays: true);
     }
 
     private void Detach()
     {
         transform.SetParent(null, worldPositionStays: true);
+
+        if (rb != null)
+        {
+            rb.simulated = simulatedBeforeAttach;
+        }
 
         // Everything Attach turned off has to come back on here, otherwise the
         // detached object stays frozen for the rest of the level.
