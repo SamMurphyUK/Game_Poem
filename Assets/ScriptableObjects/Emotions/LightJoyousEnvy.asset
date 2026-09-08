@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd5f10ad2d2c24e478d77f4576cdc37d, type: 3}
+  m_Name: LightJoyousEnvy
+  m_EditorClassIdentifier: Assembly-CSharp::CombinationRuleSO
+  matchingType: {fileID: 11400000, guid: ffd1114263b64c1480af8703067fc452, type: 2}
+  result: {fileID: 11400000, guid: d2a6be6235894fafb5f1da153b749980, type: 2}
+  sprite: {fileID: 21300000, guid: 5be2b890aa32d4c45ad710b3a4f3ac2b, type: 3}

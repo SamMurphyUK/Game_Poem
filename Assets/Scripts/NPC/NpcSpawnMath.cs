@@ -34,4 +34,48 @@ public static class NpcSpawnMath
         float max = Mathf.Max(min, maxSeconds);
         return Mathf.Lerp(min, max, Mathf.Clamp01(roll01));
     }
+
+    // roll01 is 0..1. Zero and negative weights are skipped. A roll of 1 lands
+    // on the last positive entry.
+    public static int PickWeightedIndex(float[] weights, float roll01)
+    {
+        if (weights == null || weights.Length == 0)
+        {
+            return -1;
+        }
+
+        float total = 0f;
+        for (int i = 0; i < weights.Length; i++)
+        {
+            if (weights[i] > 0f)
+            {
+                total += weights[i];
+            }
+        }
+
+        if (total <= 0f)
+        {
+            return -1;
+        }
+
+        float roll = Mathf.Clamp01(roll01) * total;
+        float acc = 0f;
+        int last = -1;
+        for (int i = 0; i < weights.Length; i++)
+        {
+            if (weights[i] <= 0f)
+            {
+                continue;
+            }
+
+            last = i;
+            acc += weights[i];
+            if (roll < acc)
+            {
+                return i;
+            }
+        }
+
+        return last;
+    }
 }

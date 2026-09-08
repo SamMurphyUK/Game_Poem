@@ -84,8 +84,22 @@ public class CombinerComponent : MonoBehaviour
             return false;
         }
 
-        return otherCombiner.currentType.GetMatchingType() == currentType
-            || currentType.GetMatchingType() == otherCombiner.currentType;
+        return currentType.CanCombineWith(otherCombiner.currentType);
+    }
+
+    public void ApplyType(CombinationRuleSO type)
+    {
+        currentType = type;
+        if (type == null)
+        {
+            return;
+        }
+
+        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
+        if (spriteRenderer != null && type.sprite != null)
+        {
+            spriteRenderer.sprite = type.sprite;
+        }
     }
 
     public bool IsBusy()
@@ -264,14 +278,8 @@ public class CombinerComponent : MonoBehaviour
             return;
         }
 
-        currentType = outResult;
+        ApplyType(outResult);
         Debug.Log("Combined into: " + outResult.name);
-        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
-
-        if (spriteRenderer != null && outResult.sprite != null)
-        {
-            spriteRenderer.sprite = outResult.sprite;
-        }
     }
 
     private void Attach(Transform host)

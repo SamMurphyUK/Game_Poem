@@ -216,7 +216,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 750eb243063084742ad27448a5dcfb69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CombinerComponent
-  currentType: {fileID: 11400000, guid: 0744ebb125b10a847ad43a06b044abec, type: 2}
+  currentType: {fileID: 11400000, guid: 989652744e7f4812814560b0e7f86fc1, type: 2}
   movementSpeed: 5
   rotationSpeed: 360
   stoppingDistance: 0.1
