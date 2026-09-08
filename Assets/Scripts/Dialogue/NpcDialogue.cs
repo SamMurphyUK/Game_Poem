@@ -37,7 +37,6 @@ public class NpcDialogue : MonoBehaviour
 
         FindListener(Time.deltaTime);
 
-        CombinationStage stage = DialogueClock.HighestPlayerStage();
         bool combining = silentWhileCombining && ownCombiner != null && ownCombiner.IsBusy();
 
         if (combining)
@@ -62,6 +61,7 @@ public class NpcDialogue : MonoBehaviour
             return;
         }
 
+        CombinationStage stage = DialogueClock.HighestPlayerStage();
         string[] lines = dialogue.GetLines(stage);
         string line = PickLine(lines);
         if (string.IsNullOrEmpty(line))
@@ -100,7 +100,7 @@ public class NpcDialogue : MonoBehaviour
 
         lookupTimer = RetryPlayerLookupAfter;
 
-        PlayerController[] players = FindObjectsByType<PlayerController>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+        PlayerController[] players = DialogueClock.Players(Time.time);
         Transform nearest = null;
         float best = float.PositiveInfinity;
 

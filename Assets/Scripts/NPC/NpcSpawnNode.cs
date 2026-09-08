@@ -31,6 +31,7 @@ public class NpcSpawnNode : MonoBehaviour
     [SerializeField] private List<NpcSpawnEntry> spawnTable = new List<NpcSpawnEntry>();
 
     private readonly List<GameObject> live = new List<GameObject>();
+    private float[] weightScratch;
     private float spawnTimer;
 
     private void Start()
@@ -87,21 +88,25 @@ public class NpcSpawnNode : MonoBehaviour
             return null;
         }
 
-        float[] weights = new float[spawnTable.Count];
+        if (weightScratch == null || weightScratch.Length != spawnTable.Count)
+        {
+            weightScratch = new float[spawnTable.Count];
+        }
+
         for (int i = 0; i < spawnTable.Count; i++)
         {
             NpcSpawnEntry entry = spawnTable[i];
             if (entry == null || entry.type == null)
             {
-                weights[i] = 0f;
+                weightScratch[i] = 0f;
             }
             else
             {
-                weights[i] = entry.weight;
+                weightScratch[i] = entry.weight;
             }
         }
 
-        int index = NpcSpawnMath.PickWeightedIndex(weights, Random.value);
+        int index = NpcSpawnMath.PickWeightedIndex(weightScratch, Random.value);
         if (index < 0)
         {
             return null;
