@@ -208,6 +208,17 @@ public class CombinerComponent : MonoBehaviour
         }
 
         AdvanceStage();
+        if (controller != null && currentStage == CombinationStage.Stage2)
+        {
+            PlayerSpeech speech = GetComponent<PlayerSpeech>();
+            if (speech != null)
+            {
+                speech.SayFirstBreak();
+            }
+        }
+
+        DialogueClock.AllowNpcSpeakAfterCombine(Time.time);
+        DialogueClock.NotifyStage(DialogueClock.HighestPlayerStage());
         ReleasePair(attachment);
     }
 

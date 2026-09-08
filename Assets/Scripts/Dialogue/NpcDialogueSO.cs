@@ -31,6 +31,6 @@ public class NpcDialogueSO : ScriptableObject
             }
         }
 
-        return defaultLines;
+        return defaultLines != null ? defaultLines : System.Array.Empty<string>();
     }
 }

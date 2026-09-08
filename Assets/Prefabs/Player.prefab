@@ -18,6 +18,8 @@ GameObject:
   - component: {fileID: 7093094819793165502}
   - component: {fileID: 8238450814262232033}
   - component: {fileID: 8412663057722190345}
+  - component: {fileID: 8822001100220033001}
+  - component: {fileID: 8822001100220033002}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -388,3 +390,36 @@ MonoBehaviour:
   startColor: {r: 1, g: 0.76, b: 0.45, a: 1}
   endColor: {r: 0.85, g: 0.3, b: 0.18, a: 0}
   sortingOrderOffset: 0
+--- !u!114 &8822001100220033001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2067279046881853296}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e8a1c3b7d924f10a2b4c6d8e0f12345, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpeechBubble
+  font: {fileID: 0}
+  heightAboveSprite: 0.8
+  labelWidth: 8
+  textSize: 0.55
+  textColor: {r: 0, g: 0, b: 0, a: 1}
+  sortingOrderOffset: 10
+  fadeDuration: 0.35
+  lingerSeconds: 4
+--- !u!114 &8822001100220033002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2067279046881853296}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e8a1c3b7d924f10a2b4c6d8e0f12346, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSpeech
+  firstBreakLine: I think we should see other triangles
