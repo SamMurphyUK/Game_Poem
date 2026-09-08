@@ -3,18 +3,25 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-// Timed overlay during play: love-count copy at 4 minutes, Escape prompt at
-// 4.5, then a fade back to the start menu.
+// Covers make no mistakes with the start menu as soon as Play is pressed, then
+// the timed love-count / Escape copy, then a fade back to that same menu.
 public class GameFlow : MonoBehaviour
 {
+    // Set by StartMenuController so a real build does not show the menu twice.
+    public static bool SkipOpeningMenu;
+
+    private GameObject startMenu;
     private Text message;
     private Image fade;
+    private bool onMenu = true;
     private bool ending;
+    private float playElapsed;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void Boot()
     {
-        if (SceneManager.GetActiveScene().name != GameFlowMath.PlayScene)
+        string scene = SceneManager.GetActiveScene().name;
+        if (scene != GameFlowMath.PlayScene && scene != "make no mistakes")
         {
             return;
         }
@@ -31,6 +38,15 @@ public class GameFlow : MonoBehaviour
     private void Start()
     {
         BuildOverlay();
+        if (SkipOpeningMenu)
+        {
+            SkipOpeningMenu = false;
+            HideMenu();
+        }
+        else
+        {
+            ShowMenu();
+        }
     }
 
     private void Update()
@@ -40,13 +56,23 @@ public class GameFlow : MonoBehaviour
             return;
         }
 
-        float elapsed = Time.timeSinceLevelLoad;
-        if (GameFlowMath.ShouldShowEscapePrompt(elapsed))
+        if (onMenu)
+        {
+            if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
+            {
+                HideMenu();
+            }
+
+            return;
+        }
+
+        playElapsed += Time.deltaTime;
+        if (GameFlowMath.ShouldShowEscapePrompt(playElapsed))
         {
             message.text = GameFlowMath.EscapePromptLine;
             message.enabled = true;
         }
-        else if (GameFlowMath.ShouldShowLoveCount(elapsed))
+        else if (GameFlowMath.ShouldShowLoveCount(playElapsed))
         {
             message.text = GameFlowMath.LoveCountLine;
             message.enabled = true;
@@ -56,7 +82,7 @@ public class GameFlow : MonoBehaviour
             message.enabled = false;
         }
 
-        if (GameFlowMath.CanEndRun(elapsed) && Input.GetKeyDown(KeyCode.Escape))
+        if (GameFlowMath.CanEndRun(playElapsed) && Input.GetKeyDown(KeyCode.Escape))
         {
             StartCoroutine(FadeToMenu());
         }
@@ -75,11 +101,42 @@ public class GameFlow : MonoBehaviour
         }
 
         fade.color = Color.black;
-        SceneManager.LoadScene(GameFlowMath.StartMenuScene, LoadSceneMode.Single);
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(GameFlowMath.PlayScene, LoadSceneMode.Single);
+    }
+
+    private void ShowMenu()
+    {
+        onMenu = true;
+        playElapsed = 0f;
+        if (message != null)
+        {
+            message.enabled = false;
+        }
+
+        if (startMenu != null)
+        {
+            startMenu.SetActive(true);
+        }
+
+        Time.timeScale = 0f;
+    }
+
+    private void HideMenu()
+    {
+        onMenu = false;
+        if (startMenu != null)
+        {
+            startMenu.SetActive(false);
+        }
+
+        Time.timeScale = 1f;
     }
 
     private void BuildOverlay()
     {
+        startMenu = StartMenuView.Build(transform);
+
         GameObject canvasObject = new GameObject("GameFlowCanvas");
         canvasObject.transform.SetParent(transform, false);
         Canvas canvas = canvasObject.AddComponent<Canvas>();
@@ -122,5 +179,10 @@ public class GameFlow : MonoBehaviour
         fadeRect.anchorMax = Vector2.one;
         fadeRect.offsetMin = Vector2.zero;
         fadeRect.offsetMax = Vector2.zero;
+    }
+
+    private void OnDestroy()
+    {
+        Time.timeScale = 1f;
     }
 }

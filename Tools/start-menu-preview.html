@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Start menu — LOVE</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #000; }
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: "Courier New", Courier, monospace;
+      color: #fff;
+      user-select: none;
+    }
+    .love {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.12em;
+      font-size: min(28vw, 220px);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      line-height: 1;
+    }
+    .v {
+      width: 0.72em;
+      height: 0.72em;
+      background: #fff;
+      clip-path: polygon(50% 100%, 0 0, 100% 0);
+      margin: 0 0.02em 0.08em;
+    }
+    .line {
+      margin-top: 2.4rem;
+      font-size: clamp(18px, 3.2vw, 36px);
+      letter-spacing: 0.04em;
+    }
+  </style>
+</head>
+<body>
+  <div class="love">
+    <span>L</span>
+    <span>O</span>
+    <span class="v" aria-hidden="true"></span>
+    <span>E</span>
+  </div>
+  <div class="line">I'm feeling lucky.</div>
+</body>
+</html>
